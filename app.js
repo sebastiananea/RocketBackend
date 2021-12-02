@@ -35,6 +35,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieparser());
 app.use("/", routes);
 
-app.listen(appConfig.port || 80, () => {
+app.listen(appConfig.port || 8080, () => {
   console.log(`Conected to ${appConfig.port}`);
 });
