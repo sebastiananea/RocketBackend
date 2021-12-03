@@ -38,4 +38,15 @@ router.post("/signUp", async (req, res) => {
     }
   });
 
+
+  router.post("/isLog", async (req, res) => {
+    const { token } = req.body;
+    var user = jwt.verify(token, "secret");
+    if (user) {
+      var userDb = await Institution.findById(user.id).lean();
+      return res.send(userDb);
+    } else return res.send(false);
+  });
+  
+
   module.exports = router;
