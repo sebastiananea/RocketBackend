@@ -85,7 +85,7 @@ router.get("/getProfiles", async (req, res) => {
 });
 
 //Actualiza el perfil del usuario
-router.put("/user/changes", async (req, res) => {
+router.post("/user/changes", async (req, res) => {
   const {
     id,
     new_country,
