@@ -13,7 +13,7 @@ router.get("/generateProfile", async (req, res) => {
 });
 
 // BORRAR TODA LA BASE DE DATOS PROFILES
-router.get("/deleteProfiles", cache(300), async (req, res) => {
+router.get("/deleteProfiles", async (req, res) => {
   await Profile.deleteMany();
   res.status(200).send("Profiles Deleted");
 });
@@ -79,7 +79,7 @@ router.post("/signin", async (req, res) => {
 });
 
 //Trae todos los Usuarios
-router.get("/getProfiles", cache("300"), async (req, res) => {
+router.get("/getProfiles", async (req, res) => {
   var usuario = await Profile.find();
   res.send(usuario);
 });
@@ -128,7 +128,7 @@ router.post("/asignTable", async (req, res) => {
 });
 
 //Busqueda Profile By Name
-router.get("/searchProfiles/:name", cache(300), async (req, res) => {
+router.get("/searchProfiles/:name", async (req, res) => {
   let name = req.params.name;
   let profiles = await Profile.find({
     name: { $regex: new RegExp(".*" + name + ".*", "i") },
@@ -137,7 +137,7 @@ router.get("/searchProfiles/:name", cache(300), async (req, res) => {
 });
 
 //Busqueda Profile By ID
-router.get("/searchProfileID/:id", cache(300), async (req, res) => {
+router.get("/searchProfileID/:id", async (req, res) => {
   let { id } = req.params;
   let profile = await Profile.findById(id);
   return res.send(profile);
