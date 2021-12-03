@@ -1,21 +1,19 @@
 const { Router, application } = require("express");
 const router = Router();
 const Profile = require("../../models/Profiles");
-const { asignTable, encrypt, shuffle} = require("./utils");
-const {generateProfile} = require("./loaded")
+const { asignTable, encrypt, shuffle } = require("./utils");
+const { generateProfile } = require("./loaded");
 const jwt = require("jsonwebtoken");
-const cache = require('../routeCache')
-
-
+const cache = require("../routeCache");
 
 // GENERADOR DE PROFILES EN BASE DE DATOS
-router.get("/generateProfile",cache(300) ,async (req, res) => {
-  var profiles = await generateProfile(1);
+router.get("/generateProfile", async (req, res) => {
+  var profiles = await generateProfile(30);
   res.send("CARGADO");
 });
 
 // BORRAR TODA LA BASE DE DATOS PROFILES
-router.get("/deleteProfiles",cache(300), async (req, res) => {
+router.get("/deleteProfiles", cache(300), async (req, res) => {
   await Profile.deleteMany();
   res.status(200).send("Profiles Deleted");
 });
@@ -81,7 +79,7 @@ router.post("/signin", async (req, res) => {
 });
 
 //Trae todos los Usuarios
-router.get("/getProfiles",cache("300"), async (req, res) => {
+router.get("/getProfiles", cache("300"), async (req, res) => {
   var usuario = await Profile.find();
   res.send(usuario);
 });
@@ -98,17 +96,19 @@ router.put("/user/changes", async (req, res) => {
     new_status,
   } = req.body;
 
-  const profile = await Profile.findById(id)
+  const profile = await Profile.findById(id);
   await Profile.findOneAndUpdate(
     { _id: id },
     {
       $set: {
-        country: new_country? new_country : profile.country,
-        email: new_email? new_email : profile.email,
-        img: new_img? new_img : profile.img,
-        about: new_about? new_about : profile.about,
-        enhableContact: new_enhableContact? new_enhableContact : profile.enhableContact,
-        status:new_status? new_status : profile.status
+        country: new_country ? new_country : profile.country,
+        email: new_email ? new_email : profile.email,
+        img: new_img ? new_img : profile.img,
+        about: new_about ? new_about : profile.about,
+        enhableContact: new_enhableContact
+          ? new_enhableContact
+          : profile.enhableContact,
+        status: new_status ? new_status : profile.status,
       },
       new: true,
     },
@@ -128,7 +128,7 @@ router.post("/asignTable", async (req, res) => {
 });
 
 //Busqueda Profile By Name
-router.get("/searchProfiles/:name",cache(300), async (req, res) => {
+router.get("/searchProfiles/:name", cache(300), async (req, res) => {
   let name = req.params.name;
   let profiles = await Profile.find({
     name: { $regex: new RegExp(".*" + name + ".*", "i") },
@@ -137,7 +137,7 @@ router.get("/searchProfiles/:name",cache(300), async (req, res) => {
 });
 
 //Busqueda Profile By ID
-router.get("/searchProfileID/:id",cache(300), async (req, res) => {
+router.get("/searchProfileID/:id", cache(300), async (req, res) => {
   let { id } = req.params;
   let profile = await Profile.findById(id);
   return res.send(profile);
@@ -156,11 +156,14 @@ router.put("/increaseLike/:id", async (req, res) => {
 });
 
 //Reportes
-router.put("/increaseReports/:id", async (req, res) => {
+router.post("/increaseReports/:id", async (req, res) => {
+  let { reportText } = req.body;
   let id = req.params.id;
   let profile = await Profile.findById(id);
-  let reports = profile.reports + 1;
-  res.send(await Profile.findByIdAndUpdate(id, { reports: reports }));
+
+  res.send(
+    await Profile.updateOne({ _id: id }, { $push: { reports: reportText } })
+  );
 });
 // router.put('/increaseLike', async (req, res) => {
 //   let id = req.body.id;
@@ -168,7 +171,6 @@ router.put("/increaseReports/:id", async (req, res) => {
 //   let points = profile.score + 1
 //   res.send(await Profile.findByIdAndUpdate(id, {score: points}))
 // })
-
 
 //Filtrar usuarios por mesa
 router.post("/filterUserByTable", async (req, res) => {
@@ -192,7 +194,6 @@ router.post("/getUsersByInstitution", async (req, res) => {
   res.send(filteredUsers);
 });
 
-
 router.post("/logMedia", async (req, res) => {
   const { name, email, img, status } = req.body;
   let exist = await Profile.findOne({ email: email });
@@ -213,7 +214,7 @@ router.post("/logMedia", async (req, res) => {
         email: email,
         img: img,
         country: "Rocket Country",
-        status: status
+        status: status,
       });
       newProfile.save();
       const token = jwt.sign(
