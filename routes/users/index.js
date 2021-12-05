@@ -63,6 +63,9 @@ router.post("/signin", async (req, res) => {
   let { email, password } = req.body;
 
   let profile = await Profile.findOne({ email: email });
+  if(!profile){
+    return res.send('El mail no corresponde con usuarios en la DB')
+  }
 
   if (encrypt(password) == profile.password) {
     const token = jwt.sign(
@@ -79,7 +82,7 @@ router.post("/signin", async (req, res) => {
 });
 
 //Trae todos los Usuarios
-router.get("/getProfiles", async (req, res) => {
+router.get("/", async (req, res) => {
   var usuario = await Profile.find();
   res.send(usuario);
 });
