@@ -1,6 +1,5 @@
 require("dotenv").config();
 const morgan = require("morgan");
-
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -17,9 +16,13 @@ const { appConfig } = require("./Config/default");
 const app = express();
 app.use(express.json());
 app.use(morgan("dev"));
-
-mongoose
-  .connect(
+app.use(cors());
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+mongoose.connect(
     `mongodb+srv://apiAdmin:${appConfig.dbPass}@rocketapp.rnqqh.mongodb.net/Rocket?retryWrites=true&w=majority`,
     {
       useNewUrlParser: true,
@@ -29,7 +32,7 @@ mongoose
   .then(() => console.log("Connected to MongoDB"))
   .catch(console.error);
 
-app.use(cors());
+
 app.use(express.urlencoded({ extended: true }));
 
 app.use(cookieparser());
