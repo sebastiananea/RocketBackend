@@ -27,8 +27,8 @@ mongoose.connect(
   )
   .then(() => console.log("Connected to MongoDB"))
   .catch(console.error);
-  app.use(cors({
-    origin: 'https://rocketprojectarg.netlify.app/'
+app.use(cors({
+    origin: 'https://rocketprojectarg.netlify.app'
 }));
 app.use(express.urlencoded({ extended: true }));
 
