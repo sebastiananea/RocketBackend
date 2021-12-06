@@ -24,11 +24,13 @@ async function asignTable(users) {
   var contador = 0
   let numTable = 1
   for (let i = 0; i < users.length; i++) {
+    let encryptLink = encrypt(`rocket${users[i].institution}${numTable}`)
     await Profile.findOneAndUpdate(
       { _id: users[i]._id },
       {
         $set: {
           table: numTable,
+          meetLink: `https://meet.jit.si/${encryptLink}`,
         },
         new: true,
       }
