@@ -1,25 +1,25 @@
 GET http://localhost:3001/getProfiles HTTP/1.1
 ###
 
-POST http://localhost:3001/signup 
+POST https://rocketproject2021.herokuapp.com/signup 
 Content-Type: application/json
 
 {
     "name": "nacho Perez",
     "country": "Argentina",
-    "email": "nacho@gmail.com",
-    "institution":"Nacho",
-    "password": "nacho"
+    "email": "nacho123@gmail.com",
+    "institution":"Henry",
+    "password": "nacho123"
 
 }
 ###
-POST http://localhost:3001/signin 
+POST https://rocketproject2021.herokuapp.com/signin
 Content-Type: application/json
 
 {
     
-    "email": "pepe@gmail.com",
-    "password": "pepe"
+    "email": "nacho123@gmail.com",
+    "password": "nacho123"
 
 }
 ###

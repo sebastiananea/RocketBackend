@@ -4,9 +4,6 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieparser = require("cookie-parser");
-const axios = require("axios");
-const Profile = require("./models/Profiles.js");
-const Institution = require("./models/Institution.js");
 const routes = require("./routes/index");
 const { appConfig } = require("./Config/default");
 
@@ -16,12 +13,8 @@ const { appConfig } = require("./Config/default");
 const app = express();
 app.use(express.json());
 app.use(morgan("dev"));
-app.use(cors());
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
+
+
 mongoose.connect(
     `mongodb+srv://apiAdmin:${appConfig.dbPass}@rocketapp.rnqqh.mongodb.net/Rocket?retryWrites=true&w=majority`,
     {
@@ -31,8 +24,9 @@ mongoose.connect(
   )
   .then(() => console.log("Connected to MongoDB"))
   .catch(console.error);
-
-
+  app.use(cors({
+    origin: 'https://rocketprojectarg.netlify.app/'
+}));
 app.use(express.urlencoded({ extended: true }));
 
 app.use(cookieparser());
