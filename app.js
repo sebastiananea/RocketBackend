@@ -1,3 +1,4 @@
+
 require("dotenv").config();
 const morgan = require("morgan");
 const express = require("express");
@@ -7,8 +8,10 @@ const cookieparser = require("cookie-parser");
 const routes = require("./routes/index");
 const { appConfig } = require("./Config/default");
 
+
 //RocketAppFranco
 //${DB_PASSWORD}
+
 
 const app = express();
 app.use(express.json());
@@ -33,5 +36,5 @@ app.use(cookieparser());
 app.use("/", routes);
 
 app.listen(process.env.PORT || appConfig.port, () => {
-  console.log(`Conected to ${appConfig.port}`);
-});
+  console.log(`Conected to ${appConfig.port}`)
+})
