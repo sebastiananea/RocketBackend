@@ -19,7 +19,10 @@ async function generateProfile(num) {
             email: name[rand_name] + lastName[rand_lastName] + "@gmail.com",
             institution: institution,
             password: encrypt(name[rand_name]),
-            img: images[rand_image]
+            img: images[rand_image],
+            group: 2,
+            active:true
+
           });
           newProfile.save();
           console.log(newProfile);
