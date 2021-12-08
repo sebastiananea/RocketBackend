@@ -86,18 +86,18 @@ router.post('/signup', async (req, res) => {
              alt="rocket"
              width="90%"
            />
-           <p className={s.parrafo}>
-             <p>
-               Do you like <br />
-               PIZZA?
-             </p>
-           </p>
+           
+             <h3>
+             The sky is not the limit <br />
+             is just the beginning...
+             </h3>
+     
          </div>
        </div>
      </div><br />
      <br />
      <br />
-     Confirm Rocket supscription in the following link: <a href="https://rocketprojectarg.netlify.app/active-account/${emailCript}">LINK TO CONFIRM</a>`, // html body
+     <h1>Confirm Rocket supscription in the following link: <a href="https://rocketprojectarg.netlify.app/active-account/${emailCript}">LINK TO CONFIRM</a></h1>`, // html body
     })
     console.log('mail sent')
   } catch (error) {
