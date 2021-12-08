@@ -5,6 +5,7 @@ const {postInstitution} = require("./utils")
 const {encrypt} = require("../users/utils")
 const jwt = require("jsonwebtoken");
 const cache = require('../routeCache')
+const { appConfig } = require("../../Config/default.js");
 
 router.post("/signUp", async (req, res) => {
     if (!req.body.email || !req.body.name || !req.body.password) {
@@ -30,7 +31,7 @@ router.post("/signUp", async (req, res) => {
         {
           id: institutionProfile._id,
         },
-        "secret"
+        `${appConfig.dbPass}`
       );
       return res.json({ token: token });
     } else {
@@ -41,7 +42,7 @@ router.post("/signUp", async (req, res) => {
 
   router.post("/isLog", async (req, res) => {
     const { token } = req.body;
-    var user = jwt.verify(token, "secret");
+    var user = jwt.verify(token,  `${appConfig.dbPass}`);
     if (user) {
       var userDb = await Institution.findById(user.id).lean();
       return res.send(userDb);
