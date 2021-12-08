@@ -97,6 +97,7 @@ router.post('/user/changes', async (req, res) => {
     new_enhableContact,
     new_about,
     new_status,
+    new_active
   } = req.body
 
   const profile = await Profile.findById(id)
@@ -112,6 +113,7 @@ router.post('/user/changes', async (req, res) => {
           ? new_enhableContact
           : profile.enhableContact,
         status: new_status ? new_status : profile.status,
+        active: new_active ? new_active : profile.active
       },
       new: true,
     },
