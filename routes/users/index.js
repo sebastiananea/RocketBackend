@@ -19,7 +19,13 @@ router.get('/deleteProfiles', async (req, res) => {
 })
 
 //Inscribirse
-router.post('/signup', async (req, res) => {
+router.post('/signup/:institution/:curso', async (req, res) => {
+  const {institution, curso} = req.params
+  const institutionReplace = institution.replace("%20",/\s+/g);
+  console.log(institutionReplace)
+  
+
+
   try {
     let user = await Profile.find({ email: req.body.email })
     console.log(user)
@@ -38,8 +44,11 @@ router.post('/signup', async (req, res) => {
         country: req.body.country,
         img: 'https://s03.s3c.es/imag/_v0/770x420/a/d/c/Huevo-twitter-770.jpg',
         password: crypted,
+        institution: institutionReplace,
+        curso
       })
       newProfile.save()
+      
       res.send(newProfile)
     }
   } catch (err) {
