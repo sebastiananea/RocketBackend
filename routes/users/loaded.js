@@ -20,7 +20,7 @@ async function generateProfile(num) {
             institution: institution,
             password: encrypt(name[rand_name]),
             img: images[rand_image],
-            group: Math.ceil(Math.random()*3
+            group: Math.ceil(Math.random()*3),
             active:true
 
           });
