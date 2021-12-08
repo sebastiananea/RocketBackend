@@ -55,7 +55,49 @@ router.post('/signup', async (req, res) => {
       to: `${req.body.email}`, // list of receivers
       subject: 'Confirmar registro Rocket ✔', // Subject line
       text: `confirm with: ${emailCript}`, // plain text body
-      html: `Confirm Rocket supscription in the following link: <a href="https://rocketprojectarg.netlify.app/active-account/${emailCript}">LINK TO CONFIRM</a>`, // html body
+      html: `<div className="mainContainer"
+      width= "100%"
+     height= "88vh"
+     display= "flex"
+     justify-content= "center"
+     align-items= "center"
+     >
+       <div className={s.container}
+       background-color= "white"
+       width="70%"
+       height= "78vh"
+       border-radius= "0.8rem"
+       box-shadow= "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;">
+        
+ 
+         <div className="imgContainer"
+          position= "relative"
+          top= "5px"
+          width= "35%"
+          height= "95%"
+          display= "flex"
+          justify-content= "center"
+          align-items= "center"
+          margin-right= "5%"
+          cursor= "none"
+          user-select= "none">
+           <img
+             src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Creative-Tail-rocket.svg/768px-Creative-Tail-rocket.svg.png"
+             alt="rocket"
+             width="90%"
+           />
+           <p className={s.parrafo}>
+             <p>
+               Do you like <br />
+               PIZZA?
+             </p>
+           </p>
+         </div>
+       </div>
+     </div><br />
+     <br />
+     <br />
+     Confirm Rocket supscription in the following link: <a href="https://rocketprojectarg.netlify.app/active-account/${emailCript}">LINK TO CONFIRM</a>`, // html body
     })
     console.log('mail sent')
   } catch (error) {
