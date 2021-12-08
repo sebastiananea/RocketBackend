@@ -20,13 +20,14 @@ router.get("/deleteProfiles", async (req, res) => {
   res.status(200).send("Profiles Deleted");
 });
 
-//Inscribirse
 
+//Inscribirse
 router.post('/signup/:institution/:curso', async (req, res) => {
   const {institution, curso} = req.params
-  const institutionReplace = institution.replace("%20",/\s+/g);
-  console.log(institutionReplace)
-  
+  const institutionReplace = institution.replace("%20",/\s+/g); 
+  var {password, email, name, country} = req.body
+  var crypted = encrypt(password)
+  var emailCript = encrypt(email)
 
 
   try {
@@ -37,33 +38,29 @@ router.post('/signup/:institution/:curso', async (req, res) => {
     } else if (user[0]) {
       throw new Error('El mail ya está registrado')
     } else {
-      const password = req.body.password
-
-      const crypted = encrypt(password)
-
-      var newProfile = await new Profile({
-        name: req.body.name,
-        email: req.body.email,
-        country: req.body.country,
+        var newProfile = await new Profile({
+        name,
+        email,
+        country,
         img: 'https://s03.s3c.es/imag/_v0/770x420/a/d/c/Huevo-twitter-770.jpg',
         password: crypted,
         institution: institutionReplace,
+        activateLink:emailCript,
         curso
       })
       newProfile.save()
       
-      res.send(newProfile)
     }
   } catch (err) {
     res.json(err)
-    console.log(err)
+    throw new Error(err)
   }
-})
+  
 
   try {
     let info = await mailer.sendMail({
       from: '"Rocket" <rocket.app.mailing@gmail.com>', // sender address
-      to: `${req.body.email}`, // list of receivers
+      to: `${email}`, // list of receivers
       subject: 'Confirmar registro Rocket ✔', // Subject line
       text: `confirm with: ${emailCript}`, // plain text body
       html: 
@@ -82,9 +79,10 @@ router.post('/signup/:institution/:curso', async (req, res) => {
            style='cursor:pointer; color:white; font-family:verdana; text-decoration:none'>Ready to launch?<br>Click <span style="text-decoration:underline">HERE</span> to confirm!</a></h3>
       `
       })
-    console.log('mail sent')
+    console.log('mail saxesfuli sent')
   } catch (error) {
-    return console.log('error mailing' + error)
+    console.log('error mailing')
+    throw new Error(error)
   }
   res.send(newProfile)
 })
@@ -227,9 +225,9 @@ router.get('/searchProfileActivate/:active', async (req, res) => {
         },
         new: true,
       })
+      
  
- 
-  return res.send(profile)
+  res.send(profile)
   
 })
 
