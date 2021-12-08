@@ -1,55 +1,60 @@
-const { Router, application } = require('express')
-const router = Router()
-const Profile = require('../../models/Profiles')
-const { asignTable, encrypt, shuffle, mailer } = require('./utils')
-const { generateProfile } = require('./loaded')
-const jwt = require('jsonwebtoken')
-const cache = require('../routeCache');
+const { Router, application } = require("express");
+const router = Router();
+const Profile = require("../../models/Profiles");
+const { AsignTables, encrypt, shuffle, mailer  } = require("./utils");
+const { generateProfile } = require("./loaded");
+const jwt = require("jsonwebtoken");
+const cache = require("../routeCache");
 const { appConfig } = require("../../Config/default.js");
 
 
 // GENERADOR DE PROFILES EN BASE DE DATOS
-router.get('/generateProfile', async (req, res) => {
-  var profiles = await generateProfile(30)
-  res.send('CARGADO')
-})
+router.get("/generateProfile", async (req, res) => {
+  var profiles = await generateProfile(55);
+  res.send("CARGADO");
+});
 
 // BORRAR TODA LA BASE DE DATOS PROFILES
-router.get('/deleteProfiles', async (req, res) => {
-  await Profile.deleteMany()
-  res.status(200).send('Profiles Deleted')
-})
+router.get("/deleteProfiles", async (req, res) => {
+  await Profile.deleteMany();
+  res.status(200).send("Profiles Deleted");
+});
 
 //Inscribirse
+
 router.post('/signup', async (req, res) => {
   const { password, email } = req.body
   var crypted = encrypt(password)
   var emailCript = encrypt(email)
   var newProfile = {}
   try {
-    let user = await Profile.find({ email: req.body.email })
+    let user = await Profile.find({ email: req.body.email.toLowerCase() })
     if (!req.body.password || !req.body.name || !req.body.email) {
-      throw new Error('Los inputs requeridos son name, email, password ')
+      throw new Error("Los inputs requeridos son name, email, password ");
     } else if (user[0]) {
-      throw new Error('El mail ya está registrado')
+      throw new Error("El mail ya está registrado");
     } else {
+
       newProfile = await new Profile({
+
         name: req.body.name,
-        email: req.body.email,
+        email: req.body.email.toLowerCase(),
         country: req.body.country,
-        img: 'https://s03.s3c.es/imag/_v0/770x420/a/d/c/Huevo-twitter-770.jpg',
+        img: "https://s03.s3c.es/imag/_v0/770x420/a/d/c/Huevo-twitter-770.jpg",
         password: crypted,
+
         activateLink: emailCript,
       })
       let responseProfile
       await newProfile.save()
     }
   } catch (err) {
-    res.json(err)
-    console.log(err)
+    res.json(err);
+    console.log(err);
   }
 
-  try {
+
+   try {
     let info = await mailer.sendMail({
       from: '"Rocket" <rocket.app.mailing@gmail.com>', // sender address
       to: `${req.body.email}`, // list of receivers
@@ -107,24 +112,27 @@ router.post('/signup', async (req, res) => {
 })
 
 
+
 //Validacion isLog
+
 router.post('/isLog', async (req, res) => {
   const { token } = req.body
   var user = jwt.verify(token, `${appConfig.dbPass}`)
   if (user) {
-    var userDb = await Profile.findById(user.id).lean()
-    return res.send(userDb)
-  } else return res.send(false)
-})
+    var userDb = await Profile.findById(user.id).lean();
+    return res.send(userDb);
+  } else return res.send(false);
+});
 
 //Ingresar
-router.post('/signin', async (req, res) => {
-  let { email, password } = req.body
+router.post("/signin", async (req, res) => {
+  let { email, password } = req.body;
 
-  let profile = await Profile.findOne({ email: email })
+
+  let profile = await Profile.findOne({ email: email.toLowerCase() });
 
   if (!profile) {
-    return res.send('El mail no corresponde con usuarios en la DB')
+    return res.send("El mail no corresponde con usuarios en la DB");
   }
   if(profile.active===false) return res.json({account:'confirm your account is required'});
   if (encrypt(password) == profile.password) {
@@ -133,22 +141,24 @@ router.post('/signin', async (req, res) => {
         id: profile._id,
       },
 
+
       `${appConfig.dbPass}`
     )
     return res.json({ token: token })
+
   } else {
-    res.send('Access Denied')
+    res.send("Access Denied");
   }
-})
+});
 
 //Trae todos los Usuarios
-router.get('/', async (req, res) => {
-  var usuario = await Profile.find()
-  res.send(usuario)
-})
+router.get("/", async (req, res) => {
+  var usuario = await Profile.find();
+  res.send(usuario);
+});
 
 //Actualiza el perfil del usuario
-router.post('/user/changes', async (req, res) => {
+router.post("/user/changes", async (req, res) => {
   const {
     id,
     new_country,
@@ -157,16 +167,18 @@ router.post('/user/changes', async (req, res) => {
     new_enhableContact,
     new_about,
     new_status,
+
     new_active
   } = req.body
 
-  const profile = await Profile.findById(id)
+
+  const profile = await Profile.findById(id);
   await Profile.findOneAndUpdate(
     { _id: id },
     {
       $set: {
         country: new_country ? new_country : profile.country,
-        email: new_email ? new_email : profile.email,
+        email: new_email ? new_email.toLowerCase() : profile.email,
         img: new_img ? new_img : profile.img,
         about: new_about ? new_about : profile.about,
         enhableContact: new_enhableContact
@@ -178,35 +190,53 @@ router.post('/user/changes', async (req, res) => {
       new: true,
     },
     async (err, result) => {
-      if (result) return res.send(await Profile.findOne({ _id: id }))
-      if (err) return res.send('user id invalid :S')
+      if (result) return res.send(await Profile.findOne({ _id: id }));
+      if (err) return res.send("user id invalid :S");
     }
-  )
-})
+  );
+});
 
 //Ruta asignacion de Mesas
-router.post('/asignTable', async (req, res) => {
-  var users = await Profile.find()
-  shuffle(users)
-  asignTable(users)
-  res.send(users)
-})
+router.post("/asignTable", async (req, res) => {
+  let profiles = await Profile.find({ institution: req.body.institution, group: req.body.group });
+
+  await Profile.updateMany(
+    {
+      group: req.body.group,
+      institution : req.body.institution
+    },
+    {
+      $set: {
+        table: 0,
+      },
+    },
+    {
+      multi: true,
+    }
+  );
+
+  await AsignTables(profiles, req.body.institution, req.body.group);
+  // shuffle(users)
+  // asignTable(users)
+
+  res.send("Mesas mezcladas exitosamente");
+});
 
 //Busqueda Profile By Name
-router.get('/searchProfiles/:name', async (req, res) => {
-  let name = req.params.name
+router.get("/searchProfiles/:name", async (req, res) => {
+  let name = req.params.name;
   let profiles = await Profile.find({
-    name: { $regex: new RegExp('.*' + name + '.*', 'i') },
-  })
-  return res.send(profiles)
-})
+    name: { $regex: new RegExp(".*" + name + ".*", "i") },
+  });
+  return res.send(profiles);
+});
 
 //Busqueda Profile By ID
-router.get('/searchProfileID/:id', async (req, res) => {
-  let { id } = req.params
-  let profile = await Profile.findById(id)
-  return res.send(profile)
-})
+router.get("/searchProfileID/:id", async (req, res) => {
+  let { id } = req.params;
+  let profile = await Profile.findById(id);
+  return res.send(profile);
+});
 
 //Busqueda Profile By pass para activar x mailing
 router.get('/searchProfileActivate/:active', async (req, res) => {
@@ -226,27 +256,27 @@ router.get('/searchProfileActivate/:active', async (req, res) => {
 })
 
 //Aumenta Likes
-router.put('/increaseLike/:id', async (req, res) => {
+router.put("/increaseLike/:id", async (req, res) => {
   try {
-    let id = req.params.id
-    let profile = await Profile.findById(id)
-    let points = profile.score + 1
-    res.send(await Profile.findByIdAndUpdate(id, { score: points }))
+    let id = req.params.id;
+    let profile = await Profile.findById(id);
+    let points = profile.score + 1;
+    res.send(await Profile.findByIdAndUpdate(id, { score: points }));
   } catch (err) {
-    console.log(err)
+    console.log(err);
   }
-})
+});
 
 //Reportes
-router.post('/increaseReports/:id', async (req, res) => {
-  let { reportText } = req.body
-  let id = req.params.id
-  let profile = await Profile.findById(id)
+router.post("/increaseReports/:id", async (req, res) => {
+  let { reportText } = req.body;
+  let id = req.params.id;
+  let profile = await Profile.findById(id);
 
   res.send(
     await Profile.updateOne({ _id: id }, { $push: { reports: reportText } })
-  )
-})
+  );
+});
 // router.put('/increaseLike', async (req, res) => {
 //   let id = req.body.id;
 //   let profile = await Profile.findById(id);
@@ -255,63 +285,68 @@ router.post('/increaseReports/:id', async (req, res) => {
 // })
 
 //Filtrar usuarios por mesa
-router.post('/filterUserByTable', async (req, res) => {
-  let { table } = req.body
+router.post("/filterUserByTable", async (req, res) => {
+  let { table } = req.body;
 
   let filteredUsers = await Profile.find({
     table: table,
-  })
+  });
 
-  res.send(filteredUsers)
-})
+  res.send(filteredUsers);
+});
 
 //Busqueda por institucion
-router.post('/getUsersByInstitution', async (req, res) => {
-  let { institution } = req.body
+router.post("/getUsersByInstitution", async (req, res) => {
+  let { institution } = req.body;
 
   let filteredUsers = await Profile.find({
     insitution: institution,
-  })
+  });
 
-  res.send(filteredUsers)
-})
+  res.send(filteredUsers);
+});
+
 
 router.post('/logMedia', async (req, res) => {
   const { name, email, img, status } = req.body
-  let exist = await Profile.findOne({ email: email })
+  let exist = await Profile.findOne({ email: email.toLowerCase()  })
   if (exist) {
     const token = jwt.sign(
       {
         id: exist._id,
       },
+
       // key desde env
       `${appConfig.dbPass}`
     )
     return res.json({ token: token })
+
   } else if (!exist) {
     try {
       var newProfile = await new Profile({
         name: name,
-        email: email,
+        email: email.toLowerCase(),
         img: img,
-        country: 'Rocket Country',
+        country: "Rocket Country",
         status: status,
-      })
-      newProfile.save()
+      });
+      newProfile.save();
       const token = jwt.sign(
         {
           id: newProfile._id,
         },
+
         //key desde env
         `${appConfig.dbPass}`
       )
       return res.json({ token: token })
+
     } catch (err) {
       console.log(
-        'Los campos requeridos son name, password, email, country, institución'
-      )
+        "Los campos requeridos son name, password, email, country, institución"
+      );
     }
   }
-})
+});
 
-module.exports = router
+module.exports = router;
