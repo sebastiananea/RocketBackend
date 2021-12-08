@@ -22,9 +22,10 @@ router.get('/deleteProfiles', async (req, res) => {
 
 //Inscribirse
 router.post('/signup', async (req, res) => {
-  const password = req.body.password
-  var crypted = encrypt(password)  
-  var newProfile={}
+  const { password, email } = req.body
+  var crypted = encrypt(password)
+  var emailCript = encrypt(email)
+  var newProfile = {}
   try {
     let user = await Profile.find({ email: req.body.email })
     if (!req.body.password || !req.body.name || !req.body.email) {
@@ -32,41 +33,37 @@ router.post('/signup', async (req, res) => {
     } else if (user[0]) {
       throw new Error('El mail ya está registrado')
     } else {
-
       newProfile = await new Profile({
         name: req.body.name,
         email: req.body.email,
         country: req.body.country,
         img: 'https://s03.s3c.es/imag/_v0/770x420/a/d/c/Huevo-twitter-770.jpg',
         password: crypted,
+        activateLink: emailCript,
       })
+      let responseProfile
       await newProfile.save()
-      
     }
   } catch (err) {
     res.json(err)
     console.log(err)
   }
-  
-      
-    try{        
-  
+
+  try {
     let info = await mailer.sendMail({
       from: '"Rocket" <rocket.app.mailing@gmail.com>', // sender address
       to: `${req.body.email}`, // list of receivers
-      subject: "Confirmar registro Rocket ✔", // Subject line
-      text: `confirm with: ${crypted}`, // plain text body
-      html: `Confirm Rocket supscription in the following link: <a href="https://rocketprojectarg.netlify.app/active-account/${crypted}">LINK TO CONFIRM</a>`, // html body
-    });
-    console.log("mail sent")
-        
+      subject: 'Confirmar registro Rocket ✔', // Subject line
+      text: `confirm with: ${emailCript}`, // plain text body
+      html: `Confirm Rocket supscription in the following link: <a href="https://rocketprojectarg.netlify.app/active-account/${emailCript}">LINK TO CONFIRM</a>`, // html body
+    })
+    console.log('mail sent')
+  } catch (error) {
+    return console.log('error mailing' + error)
   }
-  catch(error){
-    return console.log("error mailing"+ error)
-  }
-  
-
+  res.send(newProfile)
 })
+
 
 //Validacion isLog
 router.post('/isLog', async (req, res) => {
@@ -172,20 +169,18 @@ router.get('/searchProfileID/:id', async (req, res) => {
 //Busqueda Profile By pass para activar x mailing
 router.get('/searchProfileActivate/:active', async (req, res) => {
   let { active } = req.params
+  let profile= await Profile.findOneAndUpdate(
+      { activateLink: active },
+      {
+        $set: {
+          active:true
+        },
+        new: true,
+      })
+ 
+ 
+  return res.send(profile)
   
-  let access= await Profile.findOneAndUpdate(
-    { password: active },
-    {
-      $set: {
-        active:true
-      },
-      new: true,
-    },
-    async (err, result) => {
-      if (result) return res.send({activate_account:"account successfuly activated"})
-      if (err) return res.send({fail_account:"no account activable"})
-    }
-  )
 })
 
 //Aumenta Likes
