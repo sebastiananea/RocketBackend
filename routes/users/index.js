@@ -1,4 +1,5 @@
 
+
 const { Router, application } = require("express");
 const router = Router();
 const Profile = require("../../models/Profiles");
@@ -23,37 +24,43 @@ router.get("/deleteProfiles", async (req, res) => {
 
 //Inscribirse
 
-router.post('/signup', async (req, res) => {
-  const { password, email } = req.body
-  var crypted = encrypt(password)
-  var emailCript = encrypt(email)
-  var newProfile = {}
+router.post('/signup/:institution/:curso', async (req, res) => {
+  const {institution, curso} = req.params
+  const institutionReplace = institution.replace("%20",/\s+/g);
+  console.log(institutionReplace)
+  
+
+
   try {
-    let user = await Profile.find({ email: req.body.email.toLowerCase() })
+    let user = await Profile.find({ email: req.body.email })
+    console.log(user)
     if (!req.body.password || !req.body.name || !req.body.email) {
-      throw new Error("Los inputs requeridos son name, email, password ");
+      throw new Error('Los inputs requeridos son name, email, password ')
     } else if (user[0]) {
-      throw new Error("El mail ya está registrado");
+      throw new Error('El mail ya está registrado')
     } else {
+      const password = req.body.password
 
-      newProfile = await new Profile({
+      const crypted = encrypt(password)
 
+      var newProfile = await new Profile({
         name: req.body.name,
-        email: req.body.email.toLowerCase(),
+        email: req.body.email,
         country: req.body.country,
-        img: "https://s03.s3c.es/imag/_v0/770x420/a/d/c/Huevo-twitter-770.jpg",
+        img: 'https://s03.s3c.es/imag/_v0/770x420/a/d/c/Huevo-twitter-770.jpg',
         password: crypted,
-
-        activateLink: emailCript,
+        institution: institutionReplace,
+        curso
       })
-      let responseProfile
-      await newProfile.save()
+      newProfile.save()
+      
+      res.send(newProfile)
     }
   } catch (err) {
-    res.json(err);
-    console.log(err);
+    res.json(err)
+    console.log(err)
   }
-
+})
 
   try {
     let info = await mailer.sendMail({
@@ -309,3 +316,4 @@ router.post('/logMedia', async (req, res) => {
 });
 
 module.exports = router;
+

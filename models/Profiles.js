@@ -34,6 +34,9 @@ const ProfileSchema = new Schema(
       /*  required: true */
       default: "Henry",
     },
+    curso: {
+      type:String
+    },
     score: {
       type: Number,
       default: 0,
