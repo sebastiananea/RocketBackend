@@ -1,7 +1,11 @@
 //librería para encriptación
-const CryptoJS = require("crypto-js");
-const Institution = require("../../models/Institution");
-const Profile = require("../../models/Profiles");
+
+const CryptoJS = require('crypto-js')
+const Institution = require('../../models/Institution')
+const Profile = require('../../models/Profiles')
+//librería para envío de mails
+const nodemailer = require("nodemailer");
+
 
 //usarlo en el create del usuario, pasarle su pass de body
 //y en el log in para chequear el mismo con lo que ya estará en db del user
@@ -18,6 +22,17 @@ function shuffle(array) {
     [array[i], array[j]] = [array[j], array[i]];
   }
 }
+
+const mailer = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true, // true for 465, false for other ports
+  auth: {
+    user: "rocket.app.mailing@gmail.com",
+    pass: "giyzvxygygnzxyld", // pass oculta que nos ofrece gmail
+  },
+});
+
 
 // Asigna numero de mesa al usuario y lo actualiza en la db
 async function asignTable(users) {
@@ -170,13 +185,6 @@ module.exports = {
   encrypt,
   shuffle,
   asignTable,
-};
+  mailer
+}
 
-/*
-1-> Traigo todos mis usuarios
-2-> Filtro por Institución
-3-> Filtro por grupo
-4-> Ordeno por Rockets en 4 subgrupos
-5-> Le asigno, aleatoriamente, usuarios cualquiera de esos grupos
-6-> Return
-*/

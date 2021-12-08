@@ -9,7 +9,7 @@ const routes = require("./routes/index");
 const { appConfig } = require("./Config/default");
 
 
-//RocketAppFranco
+
 //${DB_PASSWORD}
 
 

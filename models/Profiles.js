@@ -38,6 +38,10 @@ const ProfileSchema = new Schema(
       type: Number,
       default: 0,
     },
+    activateLink: {
+      type: String,
+      default: "none",
+    },
     active: {
       type: Boolean,
       required: true,

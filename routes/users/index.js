@@ -1,10 +1,13 @@
+
 const { Router, application } = require("express");
 const router = Router();
 const Profile = require("../../models/Profiles");
-const { AsignTables, encrypt, shuffle } = require("./utils");
+const { AsignTables, encrypt, shuffle, mailer  } = require("./utils");
 const { generateProfile } = require("./loaded");
 const jwt = require("jsonwebtoken");
 const cache = require("../routeCache");
+const { appConfig } = require("../../Config/default.js");
+
 
 // GENERADOR DE PROFILES EN BASE DE DATOS
 router.get("/generateProfile", async (req, res) => {
@@ -19,39 +22,61 @@ router.get("/deleteProfiles", async (req, res) => {
 });
 
 //Inscribirse
-router.post("/signup", async (req, res) => {
+
+router.post('/signup', async (req, res) => {
+  const { password, email } = req.body
+  var crypted = encrypt(password)
+  var emailCript = encrypt(email)
+  var newProfile = {}
   try {
-    let user = await Profile.find({ email: req.body.email.toLowerCase() });
-    console.log(user);
+    let user = await Profile.find({ email: req.body.email.toLowerCase() })
     if (!req.body.password || !req.body.name || !req.body.email) {
       throw new Error("Los inputs requeridos son name, email, password ");
     } else if (user[0]) {
       throw new Error("El mail ya está registrado");
     } else {
-      const password = req.body.password;
 
-      const crypted = encrypt(password);
+      newProfile = await new Profile({
 
-      var newProfile = await new Profile({
         name: req.body.name,
         email: req.body.email.toLowerCase(),
         country: req.body.country,
         img: "https://s03.s3c.es/imag/_v0/770x420/a/d/c/Huevo-twitter-770.jpg",
         password: crypted,
-      });
-      newProfile.save();
-      res.send(newProfile);
+
+        activateLink: emailCript,
+      })
+      let responseProfile
+      await newProfile.save()
     }
   } catch (err) {
     res.json(err);
     console.log(err);
   }
-});
+
+
+  try {
+    let info = await mailer.sendMail({
+      from: '"Rocket" <rocket.app.mailing@gmail.com>', // sender address
+      to: `${req.body.email}`, // list of receivers
+      subject: 'Confirmar registro Rocket ✔', // Subject line
+      text: `confirm with: ${emailCript}`, // plain text body
+      html: `Confirm Rocket supscription in the following link: <a href="https://rocketprojectarg.netlify.app/active-account/${emailCript}">LINK TO CONFIRM</a>`, // html body
+    })
+    console.log('mail sent')
+  } catch (error) {
+    return console.log('error mailing' + error)
+  }
+  res.send(newProfile)
+})
+
+
 
 //Validacion isLog
-router.post("/isLog", async (req, res) => {
-  const { token } = req.body;
-  var user = jwt.verify(token, "secret");
+
+router.post('/isLog', async (req, res) => {
+  const { token } = req.body
+  var user = jwt.verify(token, `${appConfig.dbPass}`)
   if (user) {
     var userDb = await Profile.findById(user.id).lean();
     return res.send(userDb);
@@ -62,20 +87,24 @@ router.post("/isLog", async (req, res) => {
 router.post("/signin", async (req, res) => {
   let { email, password } = req.body;
 
+
   let profile = await Profile.findOne({ email: email.toLowerCase() });
+
   if (!profile) {
     return res.send("El mail no corresponde con usuarios en la DB");
   }
-
+  if(profile.active===false) return res.json({account:'confirm your account is required'});
   if (encrypt(password) == profile.password) {
     const token = jwt.sign(
       {
         id: profile._id,
       },
 
-      "secret"
-    );
-    return res.json({ token: token });
+
+      `${appConfig.dbPass}`
+    )
+    return res.json({ token: token })
+
   } else {
     res.send("Access Denied");
   }
@@ -97,7 +126,10 @@ router.post("/user/changes", async (req, res) => {
     new_enhableContact,
     new_about,
     new_status,
-  } = req.body;
+
+    new_active
+  } = req.body
+
 
   const profile = await Profile.findById(id);
   await Profile.findOneAndUpdate(
@@ -112,6 +144,7 @@ router.post("/user/changes", async (req, res) => {
           ? new_enhableContact
           : profile.enhableContact,
         status: new_status ? new_status : profile.status,
+        active: new_active ? new_active : profile.active
       },
       new: true,
     },
@@ -164,6 +197,23 @@ router.get("/searchProfileID/:id", async (req, res) => {
   return res.send(profile);
 });
 
+//Busqueda Profile By pass para activar x mailing
+router.get('/searchProfileActivate/:active', async (req, res) => {
+  let { active } = req.params
+  let profile= await Profile.findOneAndUpdate(
+      { activateLink: active },
+      {
+        $set: {
+          active:true
+        },
+        new: true,
+      })
+ 
+ 
+  return res.send(profile)
+  
+})
+
 //Aumenta Likes
 router.put("/increaseLike/:id", async (req, res) => {
   try {
@@ -215,19 +265,21 @@ router.post("/getUsersByInstitution", async (req, res) => {
   res.send(filteredUsers);
 });
 
-router.post("/logMedia", async (req, res) => {
-  const { name, email, img, status } = req.body;
-  let exist = await Profile.findOne({ email: email.toLowerCase() });
-  console.log(exist, "desde logmedia");
+
+router.post('/logMedia', async (req, res) => {
+  const { name, email, img, status } = req.body
+  let exist = await Profile.findOne({ email: email.toLowerCase()  })
   if (exist) {
     const token = jwt.sign(
       {
         id: exist._id,
       },
-      //poner alguna key desde env en vez de secret
-      "secret"
-    );
-    return res.json({ token: token });
+
+      // key desde env
+      `${appConfig.dbPass}`
+    )
+    return res.json({ token: token })
+
   } else if (!exist) {
     try {
       var newProfile = await new Profile({
@@ -242,10 +294,12 @@ router.post("/logMedia", async (req, res) => {
         {
           id: newProfile._id,
         },
-        //poner alguna key desde env en vez de secret
-        "secret"
-      );
-      return res.json({ token: token });
+
+        //key desde env
+        `${appConfig.dbPass}`
+      )
+      return res.json({ token: token })
+
     } catch (err) {
       console.log(
         "Los campos requeridos son name, password, email, country, institución"
