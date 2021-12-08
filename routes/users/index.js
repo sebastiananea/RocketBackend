@@ -11,7 +11,7 @@ const { appConfig } = require("../../Config/default.js");
 
 // GENERADOR DE PROFILES EN BASE DE DATOS
 router.get("/generateProfile", async (req, res) => {
-  var profiles = await generateProfile(55);
+  var profiles = await generateProfile(6);
   res.send("CARGADO");
 });
 
@@ -157,11 +157,11 @@ router.post("/user/changes", async (req, res) => {
 
 //Ruta asignacion de Mesas
 router.post("/asignTable", async (req, res) => {
-  let profiles = await Profile.find({ institution: req.body.institution, group: req.body.group });
+  let profiles = await Profile.find({ institution: req.body.institution, curso: req.body.curso });
 
   await Profile.updateMany(
     {
-      group: req.body.group,
+      curso: req.body.curso,
       institution : req.body.institution
     },
     {
@@ -174,7 +174,7 @@ router.post("/asignTable", async (req, res) => {
     }
   );
 
-  await AsignTables(profiles, req.body.institution, req.body.group);
+  await AsignTables(profiles, req.body.institution, req.body.curso);
   // shuffle(users)
   // asignTable(users)
 
