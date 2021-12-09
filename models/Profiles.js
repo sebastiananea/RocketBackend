@@ -57,7 +57,6 @@ const ProfileSchema = new Schema(
       type: Number,
       default: 0,
     },
-    group: Number,
     about: {
       type: String,
       default: "",
@@ -77,11 +76,6 @@ const ProfileSchema = new Schema(
 
   { collection: "profiles" }
 );
-
-ProfileSchema.methods.scores = function () {
-  let puntajes = mongoose.model;
-};
-
 const Profile = mongoose.model("Profile", ProfileSchema);
 
 module.exports = Profile;

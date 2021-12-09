@@ -11,7 +11,7 @@ const { appConfig } = require("../../Config/default.js");
 
 // GENERADOR DE PROFILES EN BASE DE DATOS
 router.get("/generateProfile", async (req, res) => {
-  var profiles = await generateProfile(6);
+  var profiles = await generateProfile(94);
   res.send("CARGADO");
 });
 
@@ -46,7 +46,6 @@ router.post('/signup', async (req, res) => {
 
         activateLink: emailCript,
       })
-      let responseProfile
       await newProfile.save()
     }
   } catch (err) {
