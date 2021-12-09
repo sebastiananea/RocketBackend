@@ -25,7 +25,7 @@ router.get("/deleteProfiles", async (req, res) => {
 router.post('/signup/:institution/:curso', async (req, res) => {
   const {institution, curso} = req.params
   const institutionReplace = institution.replace("%20",/\s+/g); 
-  var {password, email, name, country} = req.body
+  var {password, email, name, country, gender, age} = req.body
   var crypted = encrypt(password)
   var emailCript = encrypt(email)
 
@@ -46,7 +46,9 @@ router.post('/signup/:institution/:curso', async (req, res) => {
         password: crypted,
         institution: institutionReplace,
         activateLink:emailCript,
-        curso
+        curso,
+        gender,
+        age,
       })
 
       await newProfile.save()
