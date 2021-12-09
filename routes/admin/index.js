@@ -5,8 +5,8 @@ const Likes = require('../../models/Likes')
 const Reports = require('../../models/Reports')
 
 router.get('/getCohortes', async (req, res) => {
-  let cohortes = await Institution.find({ name: 'Henry' })
-  res.status(200).send(cohortes[0].groups)
+  let cohorte = await Institution.find({ name: 'Henry' })
+  res.status(200).send(cohorte[0].groups)
 })
 
 router.post('/like', async (req, res) => {
