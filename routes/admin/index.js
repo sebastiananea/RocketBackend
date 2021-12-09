@@ -18,6 +18,11 @@ router.post('/like', async (req, res) => {
   newLike.save()
 })
 
+router.get('/like/stats', async (req, res) => {
+  var getLikes = await Likes.find()
+  res.send(getLikes)
+})
+
 router.post('/report', async (req, res) => {
   const { group, date } = req.body
   var newReport = await new Reports({
@@ -25,6 +30,11 @@ router.post('/report', async (req, res) => {
     date,
   })
   newReport.save()
+})
+
+router.get('/report/stats', async (req, res) => {
+  var getReports = await Reports.find()
+  res.send(getReports)
 })
 
 module.exports = router
