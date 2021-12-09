@@ -21,9 +21,11 @@ router.get('/deleteProfiles', async (req, res) => {
 
 //Inscribirse
 router.post('/signup/:institution/:curso', async (req, res) => {
+
   const { institution, curso } = req.params
   const institutionReplace = institution.replace('%20', /\s+/g)
   var { password, email, name, country } = req.body
+
   var crypted = encrypt(password)
   var emailCript = encrypt(email)
 
@@ -44,6 +46,8 @@ router.post('/signup/:institution/:curso', async (req, res) => {
         institution: institutionReplace,
         activateLink: emailCript,
         curso,
+        gender,
+        age,
       })
 
       await newProfile.save()
@@ -264,13 +268,13 @@ router.post('/filterUserByTable', async (req, res) => {
 })
 
 //Busqueda por institucion
+
 router.post('/getUsersByInstitution', async (req, res) => {
   let { institution } = req.body
 
   let filteredUsers = await Profile.find({
     insitution: institution,
   })
-
   res.send(filteredUsers)
 })
 

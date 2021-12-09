@@ -7,6 +7,10 @@ const InstitutionSchema = new Schema(
       type: String,
       required: true,
     },
+    institution:{
+      type: String,
+      required:true,
+    },
     email: {
       type: String,
       required: true,
