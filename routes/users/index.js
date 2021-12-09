@@ -278,7 +278,6 @@ router.post("/getUsersByInstitution", async (req, res) => {
   let filteredUsers = await Profile.find({
     institution: req.body.institution,
   });
-
   res.send(filteredUsers);
 });
 

@@ -12,6 +12,7 @@ async function postInstitution({ name, email, password }) {
         name,
         email,
         password: crypted,
+        institution: name
         // users: userOfInstitution,
       })
       newInstitution.save()
