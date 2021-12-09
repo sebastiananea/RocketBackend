@@ -1,4 +1,3 @@
-
 const { Router, application } = require("express");
 const router = Router();
 const Profile = require("../../models/Profiles");
@@ -21,50 +20,70 @@ router.get("/deleteProfiles", async (req, res) => {
   res.status(200).send("Profiles Deleted");
 });
 
-//Inscribirse
 
-router.post('/signup', async (req, res) => {
-  const { password, email } = req.body
+//Inscribirse
+router.post('/signup/:institution/:curso', async (req, res) => {
+  const {institution, curso} = req.params
+  const institutionReplace = institution.replace("%20",/\s+/g); 
+  var {password, email, name, country} = req.body
   var crypted = encrypt(password)
   var emailCript = encrypt(email)
-  var newProfile = {}
+
+
   try {
-    let user = await Profile.find({ email: req.body.email.toLowerCase() })
+    let user = await Profile.find({ email: req.body.email })
+    console.log(user)
     if (!req.body.password || !req.body.name || !req.body.email) {
-      throw new Error("Los inputs requeridos son name, email, password ");
+      throw new Error('Los inputs requeridos son name, email, password ')
     } else if (user[0]) {
-      throw new Error("El mail ya está registrado");
+      throw new Error('El mail ya está registrado')
     } else {
-
-      newProfile = await new Profile({
-
-        name: req.body.name,
-        email: req.body.email.toLowerCase(),
-        country: req.body.country,
-        img: "https://s03.s3c.es/imag/_v0/770x420/a/d/c/Huevo-twitter-770.jpg",
+        var newProfile = await new Profile({
+        name,
+        email,
+        country,
+        img: 'https://s03.s3c.es/imag/_v0/770x420/a/d/c/Huevo-twitter-770.jpg',
         password: crypted,
-
-        activateLink: emailCript,
+        institution: institutionReplace,
+        activateLink:emailCript,
+        curso
       })
+
       await newProfile.save()
+ 
     }
   } catch (err) {
-    res.json(err);
-    console.log(err);
+    res.json(err)
+    throw new Error(err)
   }
-
+  
 
   try {
     let info = await mailer.sendMail({
       from: '"Rocket" <rocket.app.mailing@gmail.com>', // sender address
-      to: `${req.body.email}`, // list of receivers
+      to: `${email}`, // list of receivers
       subject: 'Confirmar registro Rocket ✔', // Subject line
       text: `confirm with: ${emailCript}`, // plain text body
-      html: `Confirm Rocket supscription in the following link: <a href="https://rocketprojectarg.netlify.app/active-account/${emailCript}">LINK TO CONFIRM</a>`, // html body
-    })
-    console.log('mail sent')
+      html: 
+      `<div style='height:450px; width:450px; background:linear-gradient(43deg, #18e, #92e); margin:auto; padding: 25px; box-sizing:border-box; border-radius:30px'>
+    
+      <h1 style="margin:auto; text-align:center; color:white; font-family:verdana; font-style: italic">ROCKET</h1>
+      
+      <div style="width:100%; text-align:center; margin-top:30px">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Creative-Tail-rocket.svg/768px-Creative-Tail-rocket.svg.png"
+           style="width: 60%">
+        </div>
+      
+      <h3 
+          style="margin:auto; text-align:center; margin-top: 30px">
+        <a href="https://rocketprojectarg.netlify.app/active-account/${emailCript}" target="_BLANK" 
+           style='cursor:pointer; color:white; font-family:verdana; text-decoration:none'>Ready to launch?<br>Click <span style="text-decoration:underline">HERE</span> to confirm!</a></h3>
+      `
+      })
+    console.log('mail saxesfuli sent')
   } catch (error) {
-    return console.log('error mailing' + error)
+    console.log('error mailing')
+    throw new Error(error)
   }
   res.send(newProfile)
 })
@@ -207,9 +226,9 @@ router.get('/searchProfileActivate/:active', async (req, res) => {
         },
         new: true,
       })
+      
  
- 
-  return res.send(profile)
+  res.send(profile)
   
 })
 
