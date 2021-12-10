@@ -5,7 +5,7 @@ const images = require('./avatars/avatarsarr')
 var name = ["Micael", "Sebastian", "Franco","Guillermo","Liam","Nicolas","Lionel","Lautaro","Marcos"];
 var lastName = ["Gomez", "Anea", "Gonzalez","Álvarez", "Bermúdez", "Riquelme", "Domínguez", "Gutiérrez "];
 var institution = "Henry";
-var curso=["19","20","21","22","23"]
+var curso=["18","19","20"]
 var curso_aob=["A", "B"]
 
 async function generateProfile(num) {

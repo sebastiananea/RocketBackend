@@ -9,7 +9,7 @@ const { appConfig } = require("../../Config/default.js");
 
 // GENERADOR DE PROFILES EN BASE DE DATOS
 router.get('/generateProfile', async (req, res) => {
-  var profiles = await generateProfile(60)
+  var profiles = await generateProfile(120)
   res.send('CARGADO')
 })
 
