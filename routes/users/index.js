@@ -257,7 +257,7 @@ router.post('/increaseReports/:id', async (req, res) => {
 // })
 
 //Filtrar usuarios por mesa
-router.post('/filterUserByTable', async (req, res) => {
+router.post('/filterUserByTable',cache(4000), async (req, res) => {
   let { table } = req.body
 
   let filteredUsers = await Profile.find({
@@ -269,7 +269,7 @@ router.post('/filterUserByTable', async (req, res) => {
 
 //Busqueda por institucion
 
-router.post('/getUsersByInstitution', async (req, res) => {
+router.post('/getUsersByInstitution',cache(4000), async (req, res) => {
   let { institution } = req.body
 
   let filteredUsers = await Profile.find({
