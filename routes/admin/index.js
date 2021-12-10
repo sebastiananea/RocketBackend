@@ -43,14 +43,13 @@ router.get('/stats', async (req, res) => {
     let cohortesPeople = []
     await Promise.all(
       cohortes.map(async (element) => {
-        console.log(element)
         let people = await Profiles.find({ curso: element })
         cohortesPeople.push({ name: element, Students: people.length })
       })
     )
     var getReports = await Reports.find()
     var getLikes = await Likes.find()
-    res.send([{name:'Reports', value: getReports.length},{name:'Likes', value: getLikes.length}])
+    res.send({likesreports: [{name:'Reports', value: getReports.length},{name:'Likes', value: getLikes.length}], students:cohortesPeople})
   }
   else if(group && group !== "GENERAL"){
     var getReports = await Reports.find({group:group})

@@ -286,7 +286,6 @@ router.post("/increaseReports/:id", async (req, res) => {
 router.post('/filterUserByTable', async (req, res) => {
   let { table } = req.body
 
-
   let filteredUsers = await Profile.find({
     table: table,
   });
