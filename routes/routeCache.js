@@ -4,10 +4,10 @@ const cache = new NodeCache();
 
 module.exports = (duration) => (req, res, next) => {
 
-  if (req.method !== "GET") {
+  /* if (req.method !== "GET") {
     console.error("Cannot cache non-GET methods");
     return next();
-  }
+  } */
   const key = req.originalUrl;
 
   const cachedResponse = cache.get(key);
