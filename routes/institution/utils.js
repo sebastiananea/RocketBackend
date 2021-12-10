@@ -23,7 +23,37 @@ async function postInstitution({ name, email, password }) {
     }
   }
 
+  //Crear nuevo grupo
+  async function postNewGroup({id,curso}) {
+    try {
+
+      const institution = await Institution.findById(id)
+      console.log(institucion)
+      return institution
+
+    } catch (error) {
+      throw new Error(error)
+    }
+    
+
+  }
+
+
+
+
+
+  //filtra por grupo
+  async function filterbygroup({curso}) {
+    try {
+
+
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
 
   module.exports = {
-      postInstitution
+      postInstitution,
+      filterbygroup,
+      postNewGroup
   }
