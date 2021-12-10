@@ -257,7 +257,7 @@ router.post("/increaseReports/:id", async (req, res) => {
 //Filtrar usuarios por mesa
 
 
-router.post('/filterUserByTable',cache(4000), async (req, res) => {
+router.post('/filterUserByTable', async (req, res) => {
   let { table } = req.body
 
 
