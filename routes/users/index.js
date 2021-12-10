@@ -23,15 +23,14 @@ router.get("/deleteProfiles", async (req, res) => {
 router.post("/signup/:institution/:curso", async (req, res) => {
   const { institution, curso } = req.params;
   const institutionReplace = institution.replace("%20", /\s+/g);
-  var { password, email, name, country } = req.body;
-
+  var { password, email, name, country, gender, age } = req.body;
+  age=parseInt(age);
   var crypted = encrypt(password);
   var emailCript = encrypt(email);
 
   try {
     let user = await Profile.find({ email: req.body.email });
-    console.log(user);
-    if (!req.body.password || !req.body.name || !req.body.email) {
+     if (!req.body.password || !req.body.name || !req.body.email) {
       throw new Error("Los inputs requeridos son name, email, password ");
     } else if (user[0]) {
       throw new Error("El mail ya está registrado");
