@@ -184,7 +184,7 @@ module.exports = {
   AsignTables,
   encrypt,
   shuffle,
-  asignTable,
+  asignTableRandom,
   mailer
 }
 
