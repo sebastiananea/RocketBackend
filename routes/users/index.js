@@ -8,10 +8,10 @@ const cache = require("../routeCache");
 const { appConfig } = require("../../Config/default.js");
 
 // GENERADOR DE PROFILES EN BASE DE DATOS
-router.get("/generateProfile", async (req, res) => {
-  var profiles = await generateProfile(94);
-  res.send("CARGADO");
-});
+router.get('/generateProfile', async (req, res) => {
+  var profiles = await generateProfile(60)
+  res.send('CARGADO')
+})
 
 // BORRAR TODA LA BASE DE DATOS PROFILES
 router.get("/deleteProfiles", async (req, res) => {
