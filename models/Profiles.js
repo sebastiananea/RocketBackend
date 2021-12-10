@@ -7,7 +7,7 @@ const ProfileSchema = new Schema(
       type: String,
       required: true,
     },
-    age:String,
+    age:Number,
     gender: String,
     password: {
       type: String,
