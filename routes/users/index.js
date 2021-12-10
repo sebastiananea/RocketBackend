@@ -1,7 +1,7 @@
 const { Router } = require("express");
 const router = Router();
 const Profile = require("../../models/Profiles");
-const { AsignTables, encrypt, shuffle, mailer } = require("./utils");
+const { AsignTables,asignTableRandom, encrypt, shuffle, mailer } = require("./utils");
 const { generateProfile } = require("./loaded");
 const jwt = require("jsonwebtoken");
 const cache = require("../routeCache");
@@ -169,6 +169,7 @@ router.post("/asignTable", async (req, res) => {
   let profiles = await Profile.find({
     institution: req.body.institution,
     curso: req.body.curso,
+    moderator: false
   });
 
   await Profile.updateMany(
@@ -192,6 +193,31 @@ router.post("/asignTable", async (req, res) => {
 
   res.send("Mesas mezcladas exitosamente");
 });
+
+router.post('/asignTableRandom', async (req, res)=>{
+  let profiles = await Profile.find({
+    institution: req.body.institution,
+    curso: req.body.curso,
+    moderator: false
+  });
+  await Profile.updateMany(
+    {
+      curso: req.body.curso,
+      institution: req.body.institution,
+    },
+    {
+      $set: {
+        table: 0,
+      },
+    },
+    {
+      multi: true,
+    }
+  );
+  shuffle(profiles)
+  asignTableRandom(profiles)
+  res.send("Mesas mezcladas aleatoriamente")
+})
 
 //Busqueda Profile By Name
 router.get("/searchProfiles/:name", async (req, res) => {

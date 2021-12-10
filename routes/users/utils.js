@@ -35,7 +35,7 @@ const mailer = nodemailer.createTransport({
 
 
 // Asigna numero de mesa al usuario y lo actualiza en la db
-async function asignTable(users) {
+async function asignTableRandom(users) {
   var contador = 0;
   let numTable = 1;
   for (let i = 0; i < users.length; i++) {
