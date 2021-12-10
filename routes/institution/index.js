@@ -48,31 +48,26 @@ router.post("/isLog", async (req, res) => {
   } else return res.send(false);
 });
 
-router.post("/cursoNuevo/:id/:curso", async (req, res) => {
-  const { id, curso } = req.params;
+router.post("/cursoNuevo", async (req, res) => {
+  const { id, curso, name } = req.body;
+
   try {
     const institution = await Institution.findById(id);
 
     const boolean = institution.groups.includes(curso);
-    console.log(boolean);
+
     if (boolean === true) {
-      res.send("El curso ya existe");
+      console.log("id:", id, "curso:", curso, name, "desde el true");
+      res.send(false);
     } else {
+      console.log("id:", id, "curso:", curso, name, "desde el else");
 
       newCurso = await Institution.updateOne(
-            { _id: id },
-            { $push: { groups: curso } }
-          );
-          res.send("Curso Creado!")
+        { _id: id },
+        { $push: { groups: curso } }
+      );
+      res.send(true);
     }
-    // if (boolean === false) {
-    //   newCurso = await Institution.updateOne(
-    //     { _id: id },
-    //     { $push: { groups: curso } }
-    //   );
-    //   res.send(newCurso)
-    // }
-
   } catch (error) {
     throw new Error(Error);
   }
