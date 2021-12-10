@@ -2,7 +2,9 @@ const { Router } = require('express')
 const router = Router()
 const Institution = require('../../models/Institution')
 const Likes = require('../../models/Likes')
+const Profiles = require("../../models/Profiles")
 const Reports = require('../../models/Reports')
+const {devolverPorFecha} = require("./utils")
 
 router.get('/getCohortes', async (req, res) => {
   let cohorte = await Institution.find({ name: 'Henry' })
@@ -32,9 +34,33 @@ router.post('/report', async (req, res) => {
   newReport.save()
 })
 
-router.get('/report/stats', async (req, res) => {
-  var getReports = await Reports.find()
-  res.send(getReports)
+router.get('/stats', async (req, res) => {
+  const group = req.query.group.toUpperCase()
+
+  if (group === "GENERAL"){
+    let cohorte = await Institution.find({ name: 'Henry' })
+    let cohortes = cohorte[0].groups
+    let cohortesPeople = []
+    await Promise.all(
+      cohortes.map(async (element) => {
+        console.log(element)
+        let people = await Profiles.find({ curso: element })
+        cohortesPeople.push({ name: element, Students: people.length })
+      })
+    )
+    var getReports = await Reports.find()
+    var getLikes = await Likes.find()
+    res.send([{name:'Reports', value: getReports.length},{name:'Likes', value: getLikes.length}])
+  }
+  else if(group && group !== "GENERAL"){
+    var getReports = await Reports.find({group:group})
+    var getLikes = await Likes.find({group:group})
+    //--------------------------------------------//
+    const likes = await devolverPorFecha(getLikes)
+    const reports = await devolverPorFecha(getReports)
+
+    res.send({likes:likes, reports: reports})
+  }
 })
 
 
