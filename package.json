@@ -24,6 +24,7 @@
     "express": "^4.17.1",
     "ioredis": "^4.19.2",
     "jsonwebtoken": "^8.5.1",
+    "mercadopago": "^1.5.9",
     "mongoose": "^6.0.13",
     "morgan": "^1.10.0",
     "node-cache": "^5.1.2",
