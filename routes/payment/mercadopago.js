@@ -12,7 +12,6 @@ mercadopago.configure({
 //venta paso 1
 router.post('/ask-pay', async (req, res) => {
   const { institution, email, id_orden, title, quantity, unit_price } = req.body
-
   const ticket = encrypt(id_orden)
   const fecha = new Date()
 
@@ -73,7 +72,7 @@ router.get('/control-pay', async (req, res) => {
         },
         new: true,
       },
-      (err, result) => {
+      /* (err, result) => {
         if (result)
           return res.redirect(
             'http://localhost:3000/payment/admin/verify-sale/true'
@@ -82,14 +81,14 @@ router.get('/control-pay', async (req, res) => {
           return res.redirect(
             'http://localhost:3000/payment/admin/verify-sale/true'
           )
-      }
+      } */
     )
   } catch (error) {
     console.log(error)
   }
 
   return res.redirect(
-    `http://localhost:3000/institucion/admin/verify-sale/true`
+     `http://localhost:3000/institucion/admin/payment?success=true`
   )
 })
 
