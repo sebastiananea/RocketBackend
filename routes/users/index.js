@@ -7,6 +7,7 @@ const jwt = require("jsonwebtoken");
 const cache = require("../routeCache");
 const { appConfig } = require("../../Config/default.js");
 
+
 // GENERADOR DE PROFILES EN BASE DE DATOS
 router.get('/generateProfile', async (req, res) => {
   var profiles = await generateProfile(120)
@@ -194,12 +195,16 @@ router.post("/asignTable", async (req, res) => {
   res.send("Mesas mezcladas exitosamente");
 });
 
+
 router.post('/asignTableRandom', async (req, res)=>{
+  console.log(req.body.institution)
   let profiles = await Profile.find({
     institution: req.body.institution,
     curso: req.body.curso,
     moderator: false
   });
+  
+  
   await Profile.updateMany(
     {
       curso: req.body.curso,
