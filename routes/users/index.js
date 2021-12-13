@@ -215,7 +215,7 @@ router.post('/asignTableRandom', async (req, res)=>{
       multi: true,
     }
   );
-  shuffle(profiles)
+  await shuffle(profiles)
   await asignTableRandom(profiles)
   res.send("Mesas mezcladas aleatoriamente")
 })
