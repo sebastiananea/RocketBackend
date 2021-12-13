@@ -7,22 +7,19 @@ const Reports = require('../../models/Reports')
 const {devolverPorFecha} = require("./utils")
 
 router.get('/getCohortes', async (req, res) => {
-  let cohorte = await Institution.find({ name: 'Henry' })
+  let cohorte = await Institution.find({ name: "Henry" })
   res.status(200).send(cohorte[0].groups)
 })
 
 router.post('/like', async (req, res) => {
   const { group, date } = req.body
+ 
   var newLike = await new Likes({
-    group,
-    date,
+    group:group,
+    date:date,
   })
   newLike.save()
-})
-
-router.get('/like/stats', async (req, res) => {
-  var getLikes = await Likes.find()
-  res.send(getLikes)
+  res.send("done")
 })
 
 router.post('/report', async (req, res) => {
@@ -32,6 +29,7 @@ router.post('/report', async (req, res) => {
     date,
   })
   newReport.save()
+  res.send("done")
 })
 
 router.get('/stats', async (req, res) => {

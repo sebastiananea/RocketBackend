@@ -9,7 +9,9 @@ const { appConfig } = require("../../Config/default.js");
 
 // GENERADOR DE PROFILES EN BASE DE DATOS
 router.get('/generateProfile', async (req, res) => {
+
   var profiles = await generateProfile(30)
+
   res.send('CARGADO')
 })
 
@@ -283,10 +285,12 @@ router.post("/increaseReports/:id", async (req, res) => {
 
 
 router.post('/filterUserByTable', async (req, res) => {
-  let { table } = req.body
+  let { table, curso, institution } = req.body
 
   let filteredUsers = await Profile.find({
     table: table,
+    curso: curso,
+    institution: institution
   });
 
   res.send(filteredUsers);
