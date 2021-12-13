@@ -1,20 +1,24 @@
 const { Router } = require("express");
 const router = Router();
 const Profile = require("../../models/Profiles");
-const { AsignTables,asignTableRandom, encrypt, shuffle, mailer } = require("./utils");
+const {
+  AsignTables,
+  asignTableRandom,
+  encrypt,
+  shuffle,
+  mailer,
+} = require("./utils");
 const { generateProfile } = require("./loaded");
 const jwt = require("jsonwebtoken");
 const cache = require("../routeCache");
 const { appConfig } = require("../../Config/default.js");
 
-
 // GENERADOR DE PROFILES EN BASE DE DATOS
-router.get('/generateProfile', async (req, res) => {
+router.get("/generateProfile", async (req, res) => {
+  var profiles = await generateProfile(30);
 
-  var profiles = await generateProfile(30)
-
-  res.send('CARGADO')
-})
+  res.send("CARGADO");
+});
 
 // BORRAR TODA LA BASE DE DATOS PROFILES
 router.get("/deleteProfiles", async (req, res) => {
@@ -27,13 +31,13 @@ router.post("/signup/:institution/:curso", async (req, res) => {
   const { institution, curso } = req.params;
   const institutionReplace = institution.replace("%20", /\s+/g);
   var { password, email, name, country, gender, age } = req.body;
-  age=parseInt(age);
+  age = parseInt(age);
   var crypted = encrypt(password);
   var emailCript = encrypt(email);
 
   try {
     let user = await Profile.find({ email: req.body.email });
-     if (!req.body.password || !req.body.name || !req.body.email) {
+    if (!req.body.password || !req.body.name || !req.body.email) {
       throw new Error("Los inputs requeridos son name, email, password ");
     } else if (user[0]) {
       throw new Error("El mail ya está registrado");
@@ -171,7 +175,7 @@ router.post("/asignTable", async (req, res) => {
   let profiles = await Profile.find({
     institution: req.body.institution,
     curso: req.body.curso,
-    moderator: false
+    moderator: false,
   });
 
   await Profile.updateMany(
@@ -196,16 +200,14 @@ router.post("/asignTable", async (req, res) => {
   res.send("Mesas mezcladas exitosamente");
 });
 
-
-router.post('/asignTableRandom', async (req, res)=>{
-  console.log(req.body.institution)
+router.post("/asignTableRandom", async (req, res) => {
+  console.log(req.body.institution);
   let profiles = await Profile.find({
     institution: req.body.institution,
     curso: req.body.curso,
-    moderator: false
+    moderator: false,
   });
-  
-  
+
   await Profile.updateMany(
     {
       curso: req.body.curso,
@@ -220,10 +222,10 @@ router.post('/asignTableRandom', async (req, res)=>{
       multi: true,
     }
   );
-  await shuffle(profiles)
-  await asignTableRandom(profiles)
-  res.send("Mesas mezcladas aleatoriamente")
-})
+  await shuffle(profiles);
+  await asignTableRandom(profiles);
+  res.send("Mesas mezcladas aleatoriamente");
+});
 
 //Busqueda Profile By Name
 router.get("/searchProfiles/:name", async (req, res) => {
@@ -288,14 +290,13 @@ router.post("/increaseReports/:id", async (req, res) => {
 
 //Filtrar usuarios por mesa
 
-
-router.post('/filterUserByTable', async (req, res) => {
-  let { table, curso, institution } = req.body
+router.post("/filterUserByTable", async (req, res) => {
+  let { table, curso, institution } = req.body;
 
   let filteredUsers = await Profile.find({
     table: table,
     curso: curso,
-    institution: institution
+    institution: institution,
   });
 
   res.send(filteredUsers);
@@ -303,10 +304,9 @@ router.post('/filterUserByTable', async (req, res) => {
 
 //Busqueda por institucion
 
+router.post("/getUsersByInstitution", cache(4000), async (req, res) => {
+  let { institution } = req.body;
 
-router.post('/getUsersByInstitution',cache(4000), async (req, res) => {
-  let { institution } = req.body
-  
   let filteredUsers = await Profile.find({
     insitution: institution,
   });
@@ -353,4 +353,53 @@ router.post("/logMedia", async (req, res) => {
   }
 });
 
+router.post("/addPresence", async (req, res) => {
+  let { ID } = req.body;
+  if (ID) {
+    try {
+      await Profile.findByIdAndUpdate({ _id: ID }, { $inc: { presences: 1 } });
+      res.send("OK")
+    } catch (err) {
+      console.log(err);
+    }
+  }
+});
+
+router.post("/addClass", async (req, res) => {
+  let { institution, curso } = req.body;
+
+  try {
+    await Profile.updateMany(
+      {
+        curso: curso,
+        institution: institution,
+        moderator: false
+      },
+      {
+        $inc: {
+          classes: 1,
+        },
+      },
+      {
+        multi: true,
+      }
+    );
+    res.send("OK")
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+router.get('/presenteeismOfCourse/:institution/:curso', async (req,res)=>{
+  let {curso, institution} = req.params
+  let profiles = await Profile.find({curso: curso, institution:institution, moderator:false});
+  let classes = profiles[0].classes;
+  let presences = 0
+  for(let i = 0 ; i<profiles.length ; i++){
+    presences = presences + profiles[i].presences
+  }
+  let presenteeism = `${((presences / profiles.length) / classes).toFixed(3)*100}%`
+  res.send(presenteeism)
+
+})
 module.exports = router;
