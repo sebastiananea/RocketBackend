@@ -7,6 +7,7 @@ const adminRoute = require('./admin/index')
 const paymentRoute = require('./payment/mercadopago')
 
 const router = Router()
+
 // Configurar los routers
 // Ejemplo: router.use('/auth', authRouter);
 router.use('/', usersRoute)
