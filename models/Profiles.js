@@ -66,10 +66,6 @@ const ProfileSchema = new Schema(
       type: String,
       default: "",
     },
-    presences: {
-      type: Number,
-      default: 0,
-    },
     reports: {
       type: Array,
     },
@@ -77,6 +73,15 @@ const ProfileSchema = new Schema(
       type: Boolean,
       default: true,
     },
+    classes:{
+      type: Number,
+      default: 0,
+    },
+    presences: {
+      type: Number,
+      default: 0,
+    },
+
   },
 
   { collection: "profiles" }
