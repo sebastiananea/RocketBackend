@@ -6,8 +6,8 @@ const Profiles = require("../../models/Profiles")
 const Reports = require('../../models/Reports')
 const {devolverPorFecha} = require("./utils")
 
-router.get('/getCohortes/:curso', async (req, res) => {
-  let cohorte = await Institution.find({ name: req.params.curso })
+router.get('/getCohortes', async (req, res) => {
+  let cohorte = await Institution.find({ name: "Henry" })
   res.status(200).send(cohorte[0].groups)
 })
 
