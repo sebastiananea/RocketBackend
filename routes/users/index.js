@@ -9,7 +9,9 @@ const { appConfig } = require("../../Config/default.js");
 
 // GENERADOR DE PROFILES EN BASE DE DATOS
 router.get('/generateProfile', async (req, res) => {
-  var profiles = await generateProfile(120)
+
+  var profiles = await generateProfile(30)
+
   res.send('CARGADO')
 })
 
@@ -136,7 +138,6 @@ router.post("/user/changes", async (req, res) => {
     new_enhableContact,
     new_about,
     new_status,
-
     new_active,
   } = req.body;
 
@@ -300,8 +301,7 @@ router.post('/filterUserByTable', async (req, res) => {
 
 router.post('/getUsersByInstitution',cache(4000), async (req, res) => {
   let { institution } = req.body
-
-
+  
   let filteredUsers = await Profile.find({
     insitution: institution,
   });
