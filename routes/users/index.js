@@ -28,9 +28,10 @@ router.get("/deleteProfiles", async (req, res) => {
 
 //Inscribirse
 router.post("/signup", async (req, res) => {
-  console.log(req.body)
+
   var { password, email, name, country, gender, age, institution, curso} = req.body;
   const institutionReplace = institution.replace("%20", /\s+/g);
+
   age = parseInt(age);
   var crypted = encrypt(password);
   var emailCript = encrypt(email);
@@ -48,9 +49,11 @@ router.post("/signup", async (req, res) => {
         country,
         img: "https://s03.s3c.es/imag/_v0/770x420/a/d/c/Huevo-twitter-770.jpg",
         password: crypted,
+
         institution: institutionReplace || "",
         activateLink: emailCript,
         curso: curso || "",
+
         gender,
         age,
       });
@@ -130,6 +133,7 @@ router.post("/signin", async (req, res) => {
 
       `${appConfig.dbPass}`
     );
+
     return res.json({ token: token });
   } else {
     res.send("Access Denied");
@@ -213,8 +217,8 @@ router.post("/asignTable", async (req, res) => {
   res.send("Mesas mezcladas exitosamente");
 });
 
+
 router.post("/asignTableRandom", async (req, res) => {
-  console.log(req.body.institution);
   let profiles = await Profile.find({
     institution: req.body.institution,
     curso: req.body.curso,
@@ -403,21 +407,19 @@ router.post("/addClass", async (req, res) => {
   }
 });
 
-router.get("/presenteeismOfCourse/:institution/:curso", async (req, res) => {
-  let { curso, institution } = req.params;
-  let profiles = await Profile.find({
-    curso: curso,
-    institution: institution,
-    moderator: false,
-  });
+
+router.get('/asistencias/:institution', async (req,res)=>{
+  let {institution} = req.params
+  let profiles = await Profile.find({institution:institution, moderator:false}).limit(100);
   let classes = profiles[0].classes;
-  let presences = 0;
-  for (let i = 0; i < profiles.length; i++) {
-    presences = presences + profiles[i].presences;
+  if (classes === 0) return res.send("100")
+  let presences = 0
+  for(let i = 0 ; i<profiles.length ; i++){
+    presences = presences + profiles[i].presences
   }
-  let presenteeism = `${
-    (presences / profiles.length / classes).toFixed(3) * 100
-  }%`;
-  res.send(presenteeism);
-});
+  let presenteeism = `${((presences / profiles.length) / classes).toFixed(3)*100}`
+  res.send(presenteeism)
+
+})
+
 module.exports = router;
