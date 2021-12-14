@@ -27,10 +27,10 @@ router.get("/deleteProfiles", async (req, res) => {
 });
 
 //Inscribirse
-router.post("/signup/:institution/:curso", async (req, res) => {
-  const { institution, curso } = req.params;
+router.post("/signup", async (req, res) => {
+  console.log(req.body)
+  var { password, email, name, country, gender, age, institution, curso} = req.body;
   const institutionReplace = institution.replace("%20", /\s+/g);
-  var { password, email, name, country, gender, age } = req.body;
   age = parseInt(age);
   var crypted = encrypt(password);
   var emailCript = encrypt(email);
@@ -48,9 +48,9 @@ router.post("/signup/:institution/:curso", async (req, res) => {
         country,
         img: "https://s03.s3c.es/imag/_v0/770x420/a/d/c/Huevo-twitter-770.jpg",
         password: crypted,
-        institution: institutionReplace,
+        institution: institutionReplace || "",
         activateLink: emailCript,
-        curso,
+        curso: curso || "",
         gender,
         age,
       });
@@ -104,9 +104,18 @@ router.post("/isLog", async (req, res) => {
 
 //Ingresar
 router.post("/signin", async (req, res) => {
-  let { email, password } = req.body;
+  let { email, password, institution, curso } = req.body;
+  let profile;
+  console.log(req.body)
 
-  let profile = await Profile.findOne({ email: email.toLowerCase() });
+  if (institution && curso) {
+    profile = await Profile.findOneAndUpdate(
+      { email: email.toLowerCase() },
+      { institution: institution, curso: curso }
+    );
+  } else {
+    profile = await Profile.findOne({ email: email.toLowerCase() });
+  }
 
   if (!profile) {
     return res.send("El mail no corresponde con usuarios en la DB");
@@ -144,6 +153,8 @@ router.post("/user/changes", async (req, res) => {
     new_about,
     new_status,
     new_active,
+    new_institution,
+    new_curso,
   } = req.body;
 
   const profile = await Profile.findById(id);
@@ -160,6 +171,8 @@ router.post("/user/changes", async (req, res) => {
           : profile.enhableContact,
         status: new_status ? new_status : profile.status,
         active: new_active ? new_active : profile.active,
+        institution: new_institution ? new_institution : profile.institution,
+        curso: new_curso ? new_curso : profile.curso,
       },
       new: true,
     },
@@ -304,7 +317,7 @@ router.post("/filterUserByTable", async (req, res) => {
 
 //Busqueda por institucion
 
-router.post("/getUsersByInstitution", cache(4000), async (req, res) => {
+router.post("/getUsersByInstitution", async (req, res) => {
   let { institution } = req.body;
 
   let filteredUsers = await Profile.find({
@@ -358,7 +371,7 @@ router.post("/addPresence", async (req, res) => {
   if (ID) {
     try {
       await Profile.findByIdAndUpdate({ _id: ID }, { $inc: { presences: 1 } });
-      res.send("OK")
+      res.send("OK");
     } catch (err) {
       console.log(err);
     }
@@ -373,7 +386,7 @@ router.post("/addClass", async (req, res) => {
       {
         curso: curso,
         institution: institution,
-        moderator: false
+        moderator: false,
       },
       {
         $inc: {
@@ -384,22 +397,27 @@ router.post("/addClass", async (req, res) => {
         multi: true,
       }
     );
-    res.send("OK")
+    res.send("OK");
   } catch (err) {
     console.log(err);
   }
 });
 
-router.get('/presenteeismOfCourse/:institution/:curso', async (req,res)=>{
-  let {curso, institution} = req.params
-  let profiles = await Profile.find({curso: curso, institution:institution, moderator:false});
+router.get("/presenteeismOfCourse/:institution/:curso", async (req, res) => {
+  let { curso, institution } = req.params;
+  let profiles = await Profile.find({
+    curso: curso,
+    institution: institution,
+    moderator: false,
+  });
   let classes = profiles[0].classes;
-  let presences = 0
-  for(let i = 0 ; i<profiles.length ; i++){
-    presences = presences + profiles[i].presences
+  let presences = 0;
+  for (let i = 0; i < profiles.length; i++) {
+    presences = presences + profiles[i].presences;
   }
-  let presenteeism = `${((presences / profiles.length) / classes).toFixed(3)*100}%`
-  res.send(presenteeism)
-
-})
+  let presenteeism = `${
+    (presences / profiles.length / classes).toFixed(3) * 100
+  }%`;
+  res.send(presenteeism);
+});
 module.exports = router;
