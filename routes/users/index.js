@@ -56,6 +56,7 @@ router.post("/signup", async (req, res) => {
 
         gender,
         age,
+        reports:[]
       });
 
       await newProfile.save();
