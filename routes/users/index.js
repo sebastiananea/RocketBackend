@@ -27,8 +27,8 @@ router.get("/deleteProfiles", async (req, res) => {
 });
 
 //Inscribirse
-router.post("/signup/:institution/:curso", async (req, res) => {
-  const { institution, curso } = req.params;
+router.post("/signup", async (req, res) => {
+  const { institution, curso } = req.query;
   const institutionReplace = institution.replace("%20", /\s+/g);
   var { password, email, name, country, gender, age } = req.body;
   age = parseInt(age);
@@ -121,6 +121,7 @@ router.post("/signin", async (req, res) => {
 
       `${appConfig.dbPass}`
     );
+
     return res.json({ token: token });
   } else {
     res.send("Access Denied");
@@ -200,8 +201,8 @@ router.post("/asignTable", async (req, res) => {
   res.send("Mesas mezcladas exitosamente");
 });
 
+
 router.post("/asignTableRandom", async (req, res) => {
-  console.log(req.body.institution);
   let profiles = await Profile.find({
     institution: req.body.institution,
     curso: req.body.curso,
