@@ -51,6 +51,7 @@ router.post("/signup", async (req, res) => {
         activateLink: emailCript,
         gender,
         age,
+        reports:[]
       });
 
       await newProfile.save();

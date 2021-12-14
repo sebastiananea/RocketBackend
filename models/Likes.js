@@ -10,6 +10,10 @@ const LikesSchema = new Schema(
     date: {
       type: String,
       required: true,
+    },
+    institution:{
+      type: String,
+      required: true,
     }
   },
   { collection: "likes" }
