@@ -324,10 +324,12 @@ router.post("/filterUserByTable", async (req, res) => {
 
 router.get("/getUsersByInstitution/:institution", async (req, res) => {
   let { institution } = req.params;
+  console.log(institution)
 
   let filteredUsers = await Profile.find({
     institution: institution,
   });
+  
   res.send(filteredUsers);
 });
 
