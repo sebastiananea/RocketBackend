@@ -11,6 +11,25 @@ router.get('/getCohortes', async (req, res) => {
   res.status(200).send(cohorte[0].groups)
 })
 
+
+router.get('/removeuser', async (req, res) => {
+  let user = req.body.id
+  console.log(user)
+  await Profiles.deleteMany({_id:user});
+  res.status(200).send("Profile Deleted");  
+})
+
+
+router.get('/removegroup', async (req, res) => {
+  let user = req.body.id
+  
+  await Profiles.findOneAndUpdate(
+    { _id: user },
+    { curso: ""}
+  );
+  res.status(200).send("User Group Deleted");  
+})
+
 router.post('/like', async (req, res) => {
   const { group, date, institution} = req.body
  
