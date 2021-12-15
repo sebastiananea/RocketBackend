@@ -322,11 +322,11 @@ router.post("/filterUserByTable", async (req, res) => {
 
 //Busqueda por institucion
 
-router.post("/getUsersByInstitution", async (req, res) => {
-  let { institution } = req.body;
+router.get("/getUsersByInstitution/:institution", async (req, res) => {
+  let { institution } = req.params;
 
   let filteredUsers = await Profile.find({
-    insitution: institution,
+    institution: institution,
   });
   res.send(filteredUsers);
 });
