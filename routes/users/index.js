@@ -30,7 +30,6 @@ router.get("/deleteProfiles", async (req, res) => {
 router.post("/signup", async (req, res) => {
 
   var { password, email, name, country, gender, age, institution, curso} = req.body;
-  const institutionReplace = institution.replace("%20", /\s+/g);
 
   age = parseInt(age);
   var crypted = encrypt(password);
@@ -50,7 +49,7 @@ router.post("/signup", async (req, res) => {
         img: "https://s03.s3c.es/imag/_v0/770x420/a/d/c/Huevo-twitter-770.jpg",
         password: crypted,
 
-        institution: institutionReplace || "",
+        institution: institution || "",
         activateLink: emailCript,
         curso: curso || "",
 
