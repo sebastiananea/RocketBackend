@@ -2,7 +2,7 @@ const { Router } = require("express");
 const router = Router();
 const Institution = require("../../models/Institution");
 const Profile = require("../../models/Profiles");
-const { postInstitution, postNewGroup } = require("./utils");
+const { postInstitution, postNewGroup, refresh } = require("./utils");
 const { encrypt } = require("../users/utils");
 const jwt = require("jsonwebtoken");
 const cache = require("../routeCache");
@@ -144,7 +144,6 @@ router.post("/instructores", async (req, res) => {
     throw new Error(error);
   }
 });
-
 router.post("/eliminarCurso", async (req, res) => {
   const { id, curso, name } = req.body;
   try {

@@ -7,9 +7,9 @@ const InstitutionSchema = new Schema(
       type: String,
       required: true,
     },
-    institution:{
+    institution: {
       type: String,
-      required:true,
+      required: true,
     },
     email: {
       type: String,
@@ -26,6 +26,10 @@ const InstitutionSchema = new Schema(
     users: {
       type: [],
       default: [],
+    },
+    suscription: {
+      type: String,
+      default: "No hay suscripcion activa",
     },
   },
   { collection: "institution" }

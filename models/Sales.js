@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-
 const SalesSchema = new Schema(
   {
     hashed_token: {
@@ -12,14 +11,17 @@ const SalesSchema = new Schema(
       type: String,
       required: true,
     },
-    institution:{
-        type:String,
-        required:true
+    institution: {
+      type: String,
+      required: true,
     },
-    verified:{
-        type:Boolean,
-        default:false
-    }
+    verified: {
+      type: Boolean,
+      default: false,
+    },
+    suscriptionTo: {
+      type: String,
+    },
   },
   { collection: "sales" }
 );
