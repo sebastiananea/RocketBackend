@@ -2,7 +2,7 @@ const { Router } = require("express");
 const router = Router();
 const Institution = require("../../models/Institution");
 const Profile = require("../../models/Profiles");
-const { postInstitution, postNewGroup } = require("./utils");
+const { postInstitution, postNewGroup, refresh } = require("./utils");
 const { encrypt } = require("../users/utils");
 const jwt = require("jsonwebtoken");
 const cache = require("../routeCache");
@@ -89,11 +89,11 @@ router.post("/cursos", async (req, res) => {
 });
 
 router.post("/alumnos", async (req, res) => {
-  const { name,value } = req.body;
- 
+  const { name, value } = req.body;
+
   try {
     let filteredUsers = await Profile.find({
-      moderator:false,
+      moderator: false,
       institution: { $regex: new RegExp(".*" + name + ".*", "i") },
     });
 
@@ -105,37 +105,36 @@ router.post("/alumnos", async (req, res) => {
   }
 });
 
-router.post("/setInstructor", async (req,res) => {
-  const {id,moderator} = req.body
-  console.log("Quitar Instructor",id, moderator)
+router.post("/setInstructor", async (req, res) => {
+  const { id, moderator } = req.body;
+  console.log("Quitar Instructor", id, moderator);
   try {
-   let instructor = await Profile.findOneAndUpdate(
+    let instructor = await Profile.findOneAndUpdate(
       { _id: id },
-       {
+      {
         $set: {
-          moderator: moderator
+          moderator: moderator,
         },
         new: true,
       },
       async (err, result) => {
         if (result) return res.send(await Profile.findOne({ _id: id }));
         if (err) return res.send("user id invalid :S");
-      })
-      console.log(result)
+      }
+    );
+    console.log(result);
   } catch (error) {
-    throw new Error(Error)
+    throw new Error(Error);
   }
-})
+});
 
-
-router.post("/instructores", async (req,res) => {
-  const { name,value } = req.body;
-  console.log(name)
+router.post("/instructores", async (req, res) => {
+  const { name, value } = req.body;
+  console.log(name);
   try {
     let filteredInstructors = await Profile.find({
       moderator: true,
       institution: { $regex: new RegExp(".*" + name + ".*", "i") },
-      
     });
 
     filteredInstructors.length
@@ -144,11 +143,6 @@ router.post("/instructores", async (req,res) => {
   } catch (error) {
     throw new Error(error);
   }
-
-
-
-})
-
-
+});
 
 module.exports = router;
