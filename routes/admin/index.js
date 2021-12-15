@@ -14,7 +14,6 @@ router.get('/getCohortes', async (req, res) => {
 
 router.get('/removeuser', async (req, res) => {
   let user = req.body.id
-  console.log(user)
   await Profiles.deleteMany({_id:user});
   res.status(200).send("Profile Deleted");  
 })
@@ -28,6 +27,18 @@ router.get('/removegroup', async (req, res) => {
     { curso: ""}
   );
   res.status(200).send("User Group Deleted");  
+})
+
+
+router.get('/changegroup', async (req, res) => {
+  let user = req.body.id
+  let group = req.body.togroup
+  
+  await Profiles.findOneAndUpdate(
+    { _id: user },
+    { curso: group}
+  );
+  res.status(200).send("User Group Changed");  
 })
 
 router.post('/like', async (req, res) => {
