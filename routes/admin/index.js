@@ -12,14 +12,14 @@ router.get('/getCohortes', async (req, res) => {
 })
 
 
-router.get('/removeuser', async (req, res) => {
+router.post('/removeuser', async (req, res) => {
   let user = req.body.id
   await Profiles.deleteMany({_id:user});
   res.status(200).send("Profile Deleted");  
 })
 
 
-router.get('/removegroup', async (req, res) => {
+router.post('/removegroup', async (req, res) => {
   let user = req.body.id
   
   await Profiles.findOneAndUpdate(
@@ -30,7 +30,7 @@ router.get('/removegroup', async (req, res) => {
 })
 
 
-router.get('/changegroup', async (req, res) => {
+router.post('/changegroup', async (req, res) => {
   let user = req.body.id
   let group = req.body.togroup
   
