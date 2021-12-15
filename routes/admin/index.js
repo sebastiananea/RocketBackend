@@ -11,22 +11,54 @@ router.get('/getCohortes', async (req, res) => {
   res.status(200).send(cohorte[0].groups)
 })
 
+
+router.post('/removeuser', async (req, res) => {
+  let user = req.body.id
+  await Profiles.deleteMany({_id:user});
+  res.status(200).send("Profile Deleted");  
+})
+
+
+router.post('/removegroup', async (req, res) => {
+  let user = req.body.id
+  
+  await Profiles.findOneAndUpdate(
+    { _id: user },
+    { curso: ""}
+  );
+  res.status(200).send("User Group Deleted");  
+})
+
+
+router.post('/changegroup', async (req, res) => {
+  let user = req.body.id
+  let group = req.body.togroup
+  
+  await Profiles.findOneAndUpdate(
+    { _id: user },
+    { curso: group}
+  );
+  res.status(200).send("User Group Changed");  
+})
+
 router.post('/like', async (req, res) => {
-  const { group, date } = req.body
+  const { group, date, institution} = req.body
  
   var newLike = await new Likes({
     group:group,
     date:date,
+    institution:institution,
   })
   newLike.save()
   res.send("done")
 })
 
 router.post('/report', async (req, res) => {
-  const { group, date } = req.body
+  const { group, date, institution } = req.body
   var newReport = await new Reports({
     group,
     date,
+    institution
   })
   newReport.save()
   res.send("done")
@@ -34,28 +66,37 @@ router.post('/report', async (req, res) => {
 
 router.get('/stats', async (req, res) => {
   const group = req.query.group.toUpperCase()
+  const institution = req.query.institution
+
 
   if (group === "GENERAL"){
-    let cohorte = await Institution.find({ name: 'Henry' })
+    let cohorte = await Institution.find({ name: institution })
+    console.log(cohorte, " soy cohorteee")
     let cohortes = cohorte[0].groups
+    console.log(cohortes, " soy cohortes")
     let cohortesPeople = []
     await Promise.all(
       cohortes.map(async (element) => {
-        let people = await Profiles.find({ curso: element })
+        let people = await Profiles.find({institution:institution, curso: element })
         cohortesPeople.push({ name: element, Students: people.length })
       })
     )
-    var getReports = await Reports.find()
-    var getLikes = await Likes.find()
+    
+    var getReports = await Reports.find({institution:institution})
+    var getLikes = await Likes.find({institution:institution})
     res.send({likesreports: [{name:'Reports', value: getReports.length},{name:'Likes', value: getLikes.length}], students:cohortesPeople})
   }
   else if(group && group !== "GENERAL"){
-    var getReports = await Reports.find({group:group})
-    var getLikes = await Likes.find({group:group})
+    var getReports = await Reports.find({institution:institution, group:group}).sort('date')
+    var getLikes = await Likes.find({institution:institution, group:group}).sort('date')
     //--------------------------------------------//
+    console.log(getReports)
     const likes = await devolverPorFecha(getLikes)
     const reports = await devolverPorFecha(getReports)
+    //AsCeNDENTe: order moongoose (.date-1)
 
+    console.log(likes, "likes")
+    console.log(reports, "repos! jajaj")
     res.send({likes:likes, reports: reports})
   }
 })

@@ -33,11 +33,11 @@ const ProfileSchema = new Schema(
     },
     institution: {
       type: String,
-      /*  required: true */
-      default: "Henry",
+      default: "",
     },
     curso: {
-      type:String
+      type:String,
+      default:""
     },
     score: {
       type: Number,

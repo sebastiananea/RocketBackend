@@ -144,5 +144,37 @@ router.post("/instructores", async (req, res) => {
     throw new Error(error);
   }
 });
+router.post("/eliminarCurso", async (req, res) => {
+  const { id, curso, name } = req.body;
+  try {
+    let institution = await Institution.findById(id);
+    let deleteGroups = institution.groups.filter((cursos) => cursos !== curso);
+
+    let updateInstitution = await Institution.findOneAndUpdate(
+      { _id: id },
+      {
+        $set: {
+          groups: deleteGroups,
+        },
+        new: true,
+      }
+    );
+
+    await Profile.updateMany(
+      { institution: name, curso: curso },
+      {
+        $set: {
+          curso: null,
+          institution: null,
+        },
+        new: true,
+      }
+    );
+
+    res.status(200).send("Curso eliminado");
+  } catch (error) {
+    throw new Error(error);
+  }
+});
 
 module.exports = router;
