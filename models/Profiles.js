@@ -15,7 +15,7 @@ const ProfileSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ["Online", "Offline", "Available", "Busy", "Slepping..."],
+      enum: ["Online", "Offline", "Available", "Busy", "Sleeping"],
       default: "Offline",
     },
     moderator: {

@@ -1,6 +1,9 @@
 const { Router } = require("express");
 const router = Router();
 const Profile = require("../../models/Profiles");
+const Likes = require("../../models/Likes");
+const Reports = require("../../models/Reports");
+const arr = require("./avatars/avatarsarr")
 const {
   AsignTables,
   asignTableRandom,
@@ -8,23 +11,39 @@ const {
   shuffle,
   mailer,
 } = require("./utils");
-const { generateProfile } = require("./loaded");
+const { generateProfile, generateLikes, generateReports} = require("./loaded");
 const jwt = require("jsonwebtoken");
 const cache = require("../routeCache");
 const { appConfig } = require("../../Config/default.js");
 
 // GENERADOR DE PROFILES EN BASE DE DATOS
 router.get("/generateProfile", async (req, res) => {
-  var profiles = await generateProfile(30);
+  var profiles = await generateProfile(1);
 
-  res.send("CARGADO");
+  res.send(profiles);
+});
+router.get("/generateLikes", async (req, res) => {
+  var Likes = await generateLikes(150);
+
+  res.send(Likes);
+});
+router.get("/generateReports", async (req, res) => {
+  var Reports = await generateReports(100);
+
+  res.send(Reports);
 });
 
 // BORRAR TODA LA BASE DE DATOS PROFILES
-router.get("/deleteProfiles", async (req, res) => {
+router.get("/deleteDB", async (req, res) => {
   await Profile.deleteMany();
-  res.status(200).send("Profiles Deleted");
+  await Likes.deleteMany();
+  await Reports.deleteMany();
+  res.status(200).send("DB Deleted");
 });
+
+router.get("/reportAzulEminem", async (req, res)=>{
+  await Profiles.findByIdAndUpdate({_id:"61bac287b7659f4a70fe0bf4"},{reports:[{value:"No participó"},{value:"Estorbó durante el meet"},{value:"Microfono siempre abierto"},{value:"Maleducada"},{value:"Uso de lenguaje"},{value:""},{value:""},{value:""}]})
+})
 
 //Inscribirse
 router.post("/signup", async (req, res) => {
@@ -46,7 +65,7 @@ router.post("/signup", async (req, res) => {
         name,
         email,
         country,
-        img: "https://s03.s3c.es/imag/_v0/770x420/a/d/c/Huevo-twitter-770.jpg",
+        img: arr[20],
         password: crypted,
 
         institution: institution || "",
@@ -82,7 +101,7 @@ router.post("/signup", async (req, res) => {
       
       <h3 
           style="margin:auto; text-align:center; margin-top: 30px">
-        <a href="https://rocketprojectarg.netlify.app/active-account/${emailCript}" target="_BLANK" 
+        <a href="http://localhost:3000/active-account/${emailCript}" target="_BLANK" 
            style='cursor:pointer; color:white; font-family:verdana; text-decoration:none'>Ready to launch?<br>Click <span style="text-decoration:underline">HERE</span> to confirm!</a></h3>
       `,
     });
