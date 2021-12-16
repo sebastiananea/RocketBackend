@@ -101,7 +101,7 @@ router.post("/signup", async (req, res) => {
       
       <h3 
           style="margin:auto; text-align:center; margin-top: 30px">
-        <a href="http://localhost:3000/active-account/${emailCript}" target="_BLANK" 
+        <a href="https://rocketproject2021.herokuapp.com/active-account/${emailCript}" target="_BLANK" 
            style='cursor:pointer; color:white; font-family:verdana; text-decoration:none'>Ready to launch?<br>Click <span style="text-decoration:underline">HERE</span> to confirm!</a></h3>
       `,
     });
